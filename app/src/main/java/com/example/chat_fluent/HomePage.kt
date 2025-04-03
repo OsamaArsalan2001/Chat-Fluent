@@ -1,5 +1,5 @@
 package com.example.chat_fluent
-
+//Osama
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
