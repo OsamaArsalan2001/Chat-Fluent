@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.chat_fluent.nav.MainScreen
 import com.example.chat_fluent.ui.theme.ChatfluentTheme
 
 class MainActivity : ComponentActivity() {
@@ -55,6 +56,10 @@ fun MyApp(){
 
         composable(SignupPage.route) {
             signupScreen()
+
+        }
+        composable(MainScreen.route) {
+            MainScreen()
 
         }
 
