@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -21,8 +22,16 @@ import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.sharp.AccountBox
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
@@ -45,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.WhiteColor
+import com.example.chat_fluent.ui.theme.buttonColorSignup
 
 @Composable
 fun signupScreen(/*navController: NavController*/){
@@ -53,6 +63,7 @@ fun signupScreen(/*navController: NavController*/){
     var emailAddress by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var level by remember { mutableStateOf("") }
+    var checked by remember { mutableStateOf(true) }
 
     Column(
 modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally  ){
@@ -60,7 +71,7 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
             modifier = Modifier
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(32.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)  ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -96,7 +107,9 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
         Column {
 
                 TextField(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp  , vertical = 10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 5.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     shape = RectangleShape  ,
                     value = firstName ,
@@ -120,7 +133,9 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
 
                 )
             TextField(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp , vertical = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
 
                 shape = RectangleShape  ,
                 value = lastName ,
@@ -144,7 +159,9 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
 
                 )
             TextField(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp  , vertical = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
 
                 shape = RectangleShape  ,
                 value = emailAddress ,
@@ -168,7 +185,10 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
 
                 )
             TextField(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp , vertical = 5.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
 
                 shape = RectangleShape  ,
                 value = password ,
@@ -192,8 +212,10 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
 
                 )
             TextField(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp , vertical = 10.dp),
-
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = RectangleShape  ,
                 value = level    ,
                 onValueChange = {
@@ -219,6 +241,84 @@ modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , 
 
                 )
             }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start ,
+            verticalAlignment = Alignment.CenterVertically
+
+        )
+        {
+            Checkbox(
+                checked = checked ,
+                onCheckedChange = {
+                    checked= it
+                } ,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = buttonColorSignup
+                )
+
+
+            )
+
+            Text(
+                "I agree with the Terms & Conditions"
+            )
+
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+
+        ) {
+            Button(
+                shape = RoundedCornerShape(10.dp),
+//                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(
+                    start = 30.dp ,
+                    end = 30.dp ,
+                    top = 20.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    Color(
+                        alpha = 255,
+                        red = 98,
+                        green = 106,
+                        blue = 231
+                    )
+                ), onClick = {
+//                navController.navigate(SignupPage.route)
+                }) {
+                Text(
+                    "Sign up", style = TextStyle(
+                        fontSize = 30.sp
+                    )
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center ,
+                verticalAlignment = Alignment.CenterVertically
+
+
+            ){
+                Text("Already registerd?")
+                TextButton(onClick = {
+
+                }) {
+                    Text(
+                        "Log in" ,
+                        style = TextStyle(
+                            color = buttonColorSignup
+                        )
+                    )
+
+                }
+
+            }
+        }
+
+
 
 
 
