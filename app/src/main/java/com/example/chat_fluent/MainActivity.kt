@@ -55,13 +55,19 @@ fun MyApp(){
 
 
         composable(SignupPage.route) {
-            signupScreen()
+            signupScreen(navController)
 
         }
         composable(MainScreen.route) {
             MainScreen()
 
         }
+
+        composable(LoginPage.route) {
+            LoginScreen(navController)
+        }
+
+
 
     }
 
