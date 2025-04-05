@@ -54,7 +54,7 @@ fun MyApp(){
 
 
         composable(SignupPage.route) {
-            signupScreen(navController)
+            signupScreen()
 
         }
 
