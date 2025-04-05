@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -58,7 +59,7 @@ import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 
 @Composable
-fun signupScreen(/*navController: NavController*/){
+fun signupScreen(navController: NavController){
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var emailAddress by remember { mutableStateOf("") }
@@ -105,7 +106,9 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
         }
 
-        Column {
+        LazyColumn {
+            item {
+
 
                 TextField(
                     modifier = Modifier
@@ -115,7 +118,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     shape = RectangleShape  ,
                     value = firstName ,
                     onValueChange = {
-                        newText -> firstName = newText
+                            newText -> firstName = newText
                     } ,
                     placeholder = {
                         Text("Enter your First name")
@@ -132,192 +135,196 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     ) ,
 
 
-                )
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 5.dp),
-
-                shape = RectangleShape  ,
-                value = lastName ,
-                onValueChange = {
-                        newText -> lastName = newText
-                } ,
-                placeholder = {
-                    Text("Enter your Last name")
-                },
-                leadingIcon = {
-                    Icon(Icons.Rounded.Person , contentDescription = "Person Icon")
-                } ,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = WhiteColor ,
-                    unfocusedContainerColor = WhiteColor ,
-                    focusedIndicatorColor = Color.Transparent ,
-                    unfocusedIndicatorColor = Color.Transparent
-
-                ) ,
-
-
-                )
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 5.dp),
-
-                shape = RectangleShape  ,
-                value = emailAddress ,
-                onValueChange = {
-                        newText -> emailAddress = newText
-                } ,
-                placeholder = {
-                    Text("Enter your Email")
-                },
-                leadingIcon = {
-                    Icon(Icons.Rounded.MailOutline , contentDescription = "Email Icon")
-                } ,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = WhiteColor,
-                    unfocusedContainerColor = WhiteColor  ,
-                    focusedIndicatorColor = Color.Transparent ,
-                    unfocusedIndicatorColor = Color.Transparent
-
-                ) ,
-
-
-                )
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp , vertical = 5.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-
-                shape = RectangleShape  ,
-                value = password ,
-                onValueChange = {
-                        newText -> password = newText
-                } ,
-                placeholder = {
-                    Text("Create Your password")
-                },
-                leadingIcon = {
-                    Icon(Icons.Rounded.Lock , contentDescription = "Password Icon")
-                } ,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = WhiteColor,
-                    unfocusedContainerColor = WhiteColor  ,
-                    focusedIndicatorColor = Color.Transparent ,
-                    unfocusedIndicatorColor = Color.Transparent
-
-                ) ,
-
-
-                )
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 5.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                shape = RectangleShape  ,
-                value = level    ,
-                onValueChange = {
-                        newText -> level   = newText
-                } ,
-                placeholder = {
-                    Text("SELECT your level")
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.public_icon) ,
-                        contentDescription = "Public Icon"
                     )
-                } ,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = WhiteColor ,
-                    unfocusedContainerColor = WhiteColor ,
-                    focusedIndicatorColor = Color.Transparent ,
-                    unfocusedIndicatorColor = Color.Transparent
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 5.dp),
 
-                ) ,
+                    shape = RectangleShape  ,
+                    value = lastName ,
+                    onValueChange = {
+                            newText -> lastName = newText
+                    } ,
+                    placeholder = {
+                        Text("Enter your Last name")
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Rounded.Person , contentDescription = "Person Icon")
+                    } ,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = WhiteColor ,
+                        unfocusedContainerColor = WhiteColor ,
+                        focusedIndicatorColor = Color.Transparent ,
+                        unfocusedIndicatorColor = Color.Transparent
 
-
-                )
-            }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start ,
-            verticalAlignment = Alignment.CenterVertically
-
-        )
-        {
-            Checkbox(
-                checked = checked ,
-                onCheckedChange = {
-                    checked= it
-                } ,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = buttonColorSignup
-                )
+                    ) ,
 
 
-            )
-
-            Text(
-                "I agree with the Terms & Conditions"
-            )
-
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth()
-
-        ) {
-            Button(
-                shape = RoundedCornerShape(10.dp),
-//                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 20.dp),
-                modifier = Modifier.fillMaxWidth().padding(
-                    start = 30.dp ,
-                    end = 30.dp ,
-                    top = 20.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    Color(
-                        alpha = 255,
-                        red = 98,
-                        green = 106,
-                        blue = 231
                     )
-                ), onClick = {
-//                navController.navigate(SignupPage.route)
-                }) {
-                Text(
-                    "Sign up", style = TextStyle(
-                        fontSize = 30.sp
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 5.dp),
+
+                    shape = RectangleShape  ,
+                    value = emailAddress ,
+                    onValueChange = {
+                            newText -> emailAddress = newText
+                    } ,
+                    placeholder = {
+                        Text("Enter your Email")
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Rounded.MailOutline , contentDescription = "Email Icon")
+                    } ,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = WhiteColor,
+                        unfocusedContainerColor = WhiteColor  ,
+                        focusedIndicatorColor = Color.Transparent ,
+                        unfocusedIndicatorColor = Color.Transparent
+
+                    ) ,
+
+
                     )
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center ,
-                verticalAlignment = Alignment.CenterVertically
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp , vertical = 5.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+
+                    shape = RectangleShape  ,
+                    value = password ,
+                    onValueChange = {
+                            newText -> password = newText
+                    } ,
+                    placeholder = {
+                        Text("Create Your password")
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Rounded.Lock , contentDescription = "Password Icon")
+                    } ,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = WhiteColor,
+                        unfocusedContainerColor = WhiteColor  ,
+                        focusedIndicatorColor = Color.Transparent ,
+                        unfocusedIndicatorColor = Color.Transparent
+
+                    ) ,
 
 
-            ){
-                Text("Already registerd?")
-                TextButton(onClick = {
-
-                }) {
-                    Text(
-                        "Log in" ,
-                        style = TextStyle(
-                            color = buttonColorSignup
+                    )
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 5.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    shape = RectangleShape  ,
+                    value = level    ,
+                    onValueChange = {
+                            newText -> level   = newText
+                    } ,
+                    placeholder = {
+                        Text("SELECT your level")
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.public_icon) ,
+                            contentDescription = "Public Icon"
                         )
+                    } ,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = WhiteColor ,
+                        unfocusedContainerColor = WhiteColor ,
+                        focusedIndicatorColor = Color.Transparent ,
+                        unfocusedIndicatorColor = Color.Transparent
+
+                    ) ,
+
+
+                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start ,
+                    verticalAlignment = Alignment.CenterVertically
+
+                )
+                {
+                    Checkbox(
+                        checked = checked ,
+                        onCheckedChange = {
+                            checked= it
+                        } ,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = buttonColorSignup
+                        )
+
+
+                    )
+
+                    Text(
+                        "I agree with the Terms & Conditions"
                     )
 
                 }
 
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+
+                ) {
+                    Button(
+                        shape = RoundedCornerShape(10.dp),
+//                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 20.dp),
+                        modifier = Modifier.fillMaxWidth().padding(
+                            start = 30.dp ,
+                            end = 30.dp ,
+                            top = 20.dp
+                        ),
+                        colors = ButtonDefaults.buttonColors(
+                            Color(
+                                alpha = 255,
+                                red = 98,
+                                green = 106,
+                                blue = 231
+                            )
+                        ), onClick = {
+                            navController.popBackStack()
+                        }) {
+                        Text(
+                            "Sign up", style = TextStyle(
+                                fontSize = 30.sp
+                            )
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center ,
+                        verticalAlignment = Alignment.CenterVertically
+
+
+                    ){
+                        Text("Already registerd?")
+                        TextButton(onClick = {
+
+                        }) {
+                            Text(
+                                "Log in" ,
+                                style = TextStyle(
+                                    color = buttonColorSignup
+                                )
+                            )
+
+                        }
+
+                    }
+                }
+
             }
+
         }
+
+
 
 
 
@@ -327,8 +334,8 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun signupScreenPreview(){
-    signupScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun signupScreenPreview(){
+//    signupScreen()
+//}

@@ -54,6 +54,9 @@ fun HomePageScreen(navController: NavController){
                 Color( red = 248 , green = 244 , blue = 252 )
 
             ),     onClick = {
+                navController.navigate(
+                    LoginPage.route
+                )
 
             }) {
                 Text("Log In" , style = TextStyle(
