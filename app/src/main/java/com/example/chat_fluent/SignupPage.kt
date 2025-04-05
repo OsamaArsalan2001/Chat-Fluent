@@ -30,6 +30,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -50,7 +51,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +69,7 @@ fun signupScreen(navController: NavController){
     var password by remember { mutableStateOf("") }
     var level by remember { mutableStateOf("") }
     var checked by remember { mutableStateOf(true) }
+    var showPassword by remember { mutableStateOf(false) }
 
     Column(
 modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenly , horizontalAlignment = Alignment.CenterHorizontally  ){
@@ -193,6 +197,43 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp , vertical = 5.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                     visualTransformation = if (showPassword) {
+
+                        VisualTransformation.None
+
+                    } else {
+
+                        PasswordVisualTransformation()
+
+                    },
+                    trailingIcon = {
+                        if (showPassword ){
+                            IconButton(onClick = {
+                                showPassword = false
+
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_visibility_24) ,
+                                    contentDescription = "hide"
+                                )
+
+                            }
+                        }
+                        else {
+                            IconButton(
+                                onClick = {showPassword = true}
+                            ) {
+                               Icon(
+                                    painter = painterResource(R.drawable.visibility_off_24px) ,
+                                    contentDescription = "hide Icon"
+
+                                )
+                            }
+
+                            
+
+                        }
+                    },
 
                     shape = RectangleShape  ,
                     value = password ,
@@ -306,7 +347,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     ){
                         Text("Already registerd?")
                         TextButton(onClick = {
-
+                            navController.navigate(LoginPage.route)
                         }) {
                             Text(
                                 "Log in" ,
