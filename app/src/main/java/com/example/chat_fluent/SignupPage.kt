@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -66,13 +67,13 @@ fun signupScreen(/*navController: NavController*/){
     var checked by remember { mutableStateOf(true) }
 
     Column(
-modifier = Modifier.fillMaxWidth() , verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally  ){
+modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenly , horizontalAlignment = Alignment.CenterHorizontally  ){
         Column(
             modifier = Modifier
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)  ,
+                .padding(start = 20.dp , end = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)  ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
