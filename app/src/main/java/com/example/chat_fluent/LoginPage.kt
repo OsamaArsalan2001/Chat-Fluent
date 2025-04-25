@@ -44,9 +44,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController , auth: FirebaseAuth){
     var emailAddress by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("")}
     var checked by remember { mutableStateOf(true) }

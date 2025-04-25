@@ -1,6 +1,7 @@
 package com.example.chat_fluent
 
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
@@ -42,10 +45,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -57,19 +62,44 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
+import com.google.firebase.auth.FirebaseAuth
+import kotlin.text.Regex
 
 @Composable
-fun signupScreen(navController: NavController){
+fun signupScreen(navController: NavController , auth: FirebaseAuth){
+    var openDialog by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
+    var isErrorFirstName by remember { mutableStateOf(false) }
     var lastName by remember { mutableStateOf("") }
+    var isErrorLastName by remember { mutableStateOf(false) }
     var emailAddress by remember { mutableStateOf("") }
+    var isErrorEmailAddress by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
+    var isErrorPassword by remember { mutableStateOf(false) }
     var level by remember { mutableStateOf("") }
+    var isErrorLevel by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(true) }
     var showPassword by remember { mutableStateOf(false) }
+    fun isValidName(text:String):Boolean{
+        return text.matches(regex = Regex("[a-zA-Z]{3,}"))
+    }
+
+    fun isValidEmail(text:String):Boolean{
+        return text.matches(regex = Regex("[a-zA-Z]+[0-9]*@gmail\\.com"))
+    }
+
+    fun isValidPassword(text:String):Boolean{
+        return text.matches(regex = Regex("^[^+_)(*&^%\$#@!\\\\\\\":?><]*\$"))
+    }
+
+    fun isValidSelected(text:String):Boolean{
+        return text.matches(regex = Regex("^[A-C][1-2]$"))
+    }
 
     Column(
 modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenly , horizontalAlignment = Alignment.CenterHorizontally  ){
@@ -123,6 +153,13 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = firstName ,
                     onValueChange = {
                             newText -> firstName = newText
+                           if(isValidName(firstName)){
+                               isErrorFirstName = false
+                           }
+                        else {
+                            isErrorFirstName = true
+                        }
+
                     } ,
                     placeholder = {
                         Text("Enter your First name")
@@ -137,6 +174,21 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorFirstName ,
+                    supportingText = {
+                        if (isErrorFirstName){
+                            if (firstName.isEmpty()){
+                                Text("Insert First name")
+                            }
+                            else if (!isValidName(firstName)) {
+                                Text("insert by the pattern like osamaHelal")
+                            }
+                            else {
+                                isErrorFirstName = false
+                            }
+                        }
+                    }
+
 
 
                     )
@@ -149,6 +201,12 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = lastName ,
                     onValueChange = {
                             newText -> lastName = newText
+                        if(isValidName(lastName)){
+                            isErrorLastName = false
+                        }
+                        else {
+                            isErrorLastName = true
+                        }
                     } ,
                     placeholder = {
                         Text("Enter your Last name")
@@ -163,9 +221,25 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorLastName ,
+                    supportingText = {
+                        if (isErrorLastName){
+                            if (lastName.isEmpty()){
+                                Text("Insert last name")
+                            }
+                            else if (!isValidName(lastName)) {
+                                Text("insert by the pattern like osamaHelal")
+                            }
+                            else {
+                                isErrorLastName = false
+                            }
+                        }
+                    }
 
 
-                    )
+
+
+                )
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -175,6 +249,12 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = emailAddress ,
                     onValueChange = {
                             newText -> emailAddress = newText
+                        if(isValidEmail(emailAddress)){
+                            isErrorEmailAddress = false
+                        }
+                        else {
+                            isErrorEmailAddress = true
+                        }
                     } ,
                     placeholder = {
                         Text("Enter your Email")
@@ -189,9 +269,26 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorEmailAddress ,
+                    supportingText = {
+                        if (isErrorEmailAddress){
+                            if (emailAddress.isEmpty()){
+                                Text("Insert Email")
+                            }
+                            else if (!isValidEmail(emailAddress)) {
+                                Text("insert by the pattern like osamaHelal@gmail.com")
+                            }
+                            else {
+                                isErrorEmailAddress = false
+                            }
+
+                        }
+                    }
 
 
-                    )
+
+
+                )
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -230,7 +327,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 )
                             }
 
-                            
+
 
                         }
                     },
@@ -239,6 +336,13 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = password ,
                     onValueChange = {
                             newText -> password = newText
+                        if(isValidPassword(password)){
+                            isErrorPassword = false
+                        }
+                        else {
+                            isErrorPassword = true
+                        }
+
                     } ,
                     placeholder = {
                         Text("Create Your password")
@@ -253,9 +357,26 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorPassword ,
+                    supportingText = {
+                        if (isErrorPassword){
+                            if (password.isEmpty()){
+                                Text("Insert password")
+                            }
+                            else if ( !isValidPassword(password)) {
+                                Text("insert password only numbers ")
+                            }
+                            else {
+                                isErrorPassword = false
+                            }
+
+                        }
+                    }
 
 
-                    )
+
+
+                )
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -265,6 +386,12 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = level    ,
                     onValueChange = {
                             newText -> level   = newText
+                        if(isValidEmail(level)){
+                            isErrorLevel = false
+                        }
+                        else {
+                            isErrorLevel = true
+                        }
                     } ,
                     placeholder = {
                         Text("SELECT your level")
@@ -282,9 +409,25 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorLevel ,
+                    supportingText = {
+                        if (isErrorLevel){
+                            if (level.isEmpty()){
+                                Text("Insert Level")
+                            }
+                            else if(!isValidSelected(level)) {
+                                Text("insert Those value only A1 , A2  , B1 , B2 , C1 , C2")
+                            }
+                            else {
+                                isErrorLevel = false
+                            }
+                        }
+                    }
 
 
-                    )
+
+
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start ,
@@ -300,6 +443,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         colors = CheckboxDefaults.colors(
                             checkedColor = buttonColorSignup
                         )
+
 
 
                     )
@@ -330,13 +474,51 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 blue = 231
                             )
                         ), onClick = {
-                            navController.popBackStack()
-                        }) {
+//                            navController.popBackStack()
+                            if (
+                                (isValidName(firstName) && firstName.isNotEmpty()) && isValidName(lastName) && lastName.isNotEmpty() && (isValidEmail(emailAddress) && emailAddress.isNotEmpty() ) && (isValidPassword(password) && (password.isNotEmpty())) &&
+                                (isValidSelected(level) && level.isNotEmpty())
+                                ){
+                                isErrorFirstName = false
+                                isErrorFirstName = false
+                                isErrorEmailAddress = false
+                                isErrorPassword = false
+                                isErrorLevel  = false
+//                                navController.popBackStack()
+                                openDialog = true
+
+
+                            }
+
+                            else {
+
+
+                            }
+                        } ,
+
+
+                    ) {
+
                         Text(
                             "Sign up", style = TextStyle(
                                 fontSize = 30.sp
                             )
                         )
+                    }
+                    if(openDialog){
+                        Dialog(
+                            onDismissRequest = { openDialog = false },
+                            DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+                        ) {
+                            Box(
+                                contentAlignment= Alignment.Center,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .background(White, shape = RoundedCornerShape(8.dp))
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -373,7 +555,14 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
     }
 
+    suspend fun createUser(auth: FirebaseAuth){
+
+
+
+    }
+
 }
+
 
 //@Preview(showBackground = true)
 //@Composable

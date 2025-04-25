@@ -16,13 +16,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chat_fluent.nav.MainScreen
 import com.example.chat_fluent.ui.theme.ChatfluentTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+    private  var auth: FirebaseAuth = Firebase.auth
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApp()
+            MyApp(auth)
         }
     }
 }
@@ -46,7 +52,7 @@ fun GreetingPreview() {
 
 //
 @Composable
-fun MyApp(){
+fun MyApp(auth:FirebaseAuth){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HomePage.route){
         composable(HomePage.route) {
@@ -55,7 +61,7 @@ fun MyApp(){
 
 
         composable(SignupPage.route) {
-            signupScreen(navController)
+            signupScreen(navController , auth)
 
         }
         composable(MainScreen.route) {
@@ -63,7 +69,7 @@ fun MyApp(){
 
         }
 
-        composable(LoginPage.route) {
+        composable(LoginPage.route , auth) {
             LoginScreen(navController)
         }
 
