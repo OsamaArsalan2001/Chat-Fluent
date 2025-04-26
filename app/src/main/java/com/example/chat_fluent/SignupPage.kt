@@ -1,5 +1,9 @@
 package com.example.chat_fluent
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -64,14 +69,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavController
+import com.example.chat_fluent.Models.User
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.text.Regex
 
+@SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @Composable
-fun signupScreen(navController: NavController , auth: FirebaseAuth){
+fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
+    val context:Context = LocalContext.current
+     lateinit var user : User
+    val scope = rememberCoroutineScope()
     var openDialog by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
     var isErrorFirstName by remember { mutableStateOf(false) }
@@ -85,6 +103,53 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth){
     var isErrorLevel by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(true) }
     var showPassword by remember { mutableStateOf(false) }
+    suspend fun createUser(auth: FirebaseAuth , context:Context){
+        // here I will put condition if the user register before or not by check the mal
+
+        auth.createUserWithEmailAndPassword(
+            emailAddress ,
+            password
+        ).addOnCompleteListener { task ->
+            if (task.isSuccessful){
+                Log.d("Authentication Side Success", "createUserWithEmail:success")
+                val userMap = mapOf(
+                    "First name" to user.firstName ,
+                    "last name" to user.lastName ,
+                    "email" to user.email ,
+                    "password" to user.password ,
+                    "level" to user.level
+                )
+                val db = Firebase.firestore
+                db.collection("Users").add(userMap)
+                    .addOnSuccessListener{
+                            DocumentReference ->
+                        Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ID: ${DocumentReference.id}")
+                        openDialog  = false
+                        Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
+
+                    }
+                    .addOnFailureListener {exception ->
+                        Log.w("From FireStore Cloud" , "Error adding document" , exception )
+                    }
+
+
+            }
+            else {
+                Log.w("Authentication Side Failure", "createUserWithEmail:failure", task.exception)
+                openDialog = false
+                Toast.makeText(context , "Authentication Failed because Internet Connection" ,Toast.LENGTH_SHORT ).show()
+
+            }
+
+        }
+
+
+
+
+
+
+
+    }
     fun isValidName(text:String):Boolean{
         return text.matches(regex = Regex("[a-zA-Z]{3,}"))
     }
@@ -153,7 +218,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = firstName ,
                     onValueChange = {
                             newText -> firstName = newText
-                           if(isValidName(firstName)){
+                           if(isValidName(firstName) && firstName.isNotEmpty()){
                                isErrorFirstName = false
                            }
                         else {
@@ -201,7 +266,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = lastName ,
                     onValueChange = {
                             newText -> lastName = newText
-                        if(isValidName(lastName)){
+                        if(isValidName(lastName) && lastName.isNotEmpty()){
                             isErrorLastName = false
                         }
                         else {
@@ -249,7 +314,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = emailAddress ,
                     onValueChange = {
                             newText -> emailAddress = newText
-                        if(isValidEmail(emailAddress)){
+                        if(isValidEmail(emailAddress) && emailAddress.isNotEmpty()){
                             isErrorEmailAddress = false
                         }
                         else {
@@ -336,7 +401,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = password ,
                     onValueChange = {
                             newText -> password = newText
-                        if(isValidPassword(password)){
+                        if(isValidPassword(password) && password.isNotEmpty()){
                             isErrorPassword = false
                         }
                         else {
@@ -386,7 +451,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     value = level    ,
                     onValueChange = {
                             newText -> level   = newText
-                        if(isValidEmail(level)){
+                        if(isValidEmail(level) && level.isNotEmpty()){
                             isErrorLevel = false
                         }
                         else {
@@ -479,6 +544,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 (isValidName(firstName) && firstName.isNotEmpty()) && isValidName(lastName) && lastName.isNotEmpty() && (isValidEmail(emailAddress) && emailAddress.isNotEmpty() ) && (isValidPassword(password) && (password.isNotEmpty())) &&
                                 (isValidSelected(level) && level.isNotEmpty())
                                 ){
+                                user = User(firstName = firstName , lastName = lastName , email = emailAddress , password = password , level = level)
                                 isErrorFirstName = false
                                 isErrorFirstName = false
                                 isErrorEmailAddress = false
@@ -486,14 +552,23 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 isErrorLevel  = false
 //                                navController.popBackStack()
                                 openDialog = true
+                                    scope.launch{
+                                        createUser(auth , context)
+
+                                    }
+
+
+
+
 
 
                             }
-
                             else {
 
 
                             }
+
+
                         } ,
 
 
@@ -510,6 +585,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                             onDismissRequest = { openDialog = false },
                             DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
                         ) {
+
                             Box(
                                 contentAlignment= Alignment.Center,
                                 modifier = Modifier
@@ -520,6 +596,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                             }
                         }
                     }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center ,
@@ -555,11 +632,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
     }
 
-    suspend fun createUser(auth: FirebaseAuth){
 
-
-
-    }
 
 }
 
