@@ -103,45 +103,74 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
     var isErrorLevel by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(true) }
     var showPassword by remember { mutableStateOf(false) }
+    val db = Firebase.firestore
     suspend fun createUser(auth: FirebaseAuth , context:Context){
         // here I will put condition if the user register before or not by check the mal
+        val docRef = db.collection("Users").document("$emailAddress")
+        docRef.get()
+            .addOnSuccessListener {document ->
+                if (document != null ){
+                    Toast.makeText(context , "you register before by this mail " , Toast.LENGTH_SHORT).show()
+                    openDialog = false
+                }
+                else {
+                    auth.createUserWithEmailAndPassword(
+                        emailAddress ,
+                        password
+                    ).addOnCompleteListener { task ->
+                        if (task.isSuccessful){
+                            Log.d("Authentication Side Success", "createUserWithEmail:success")
+                            val userMap = mapOf(
+                                "First name" to user.firstName ,
+                                "last name" to user.lastName ,
+                                "email" to user.email ,
+                                "password" to user.password ,
+                                "level" to user.level
+                            )
 
-        auth.createUserWithEmailAndPassword(
-            emailAddress ,
-            password
-        ).addOnCompleteListener { task ->
-            if (task.isSuccessful){
-                Log.d("Authentication Side Success", "createUserWithEmail:success")
-                val userMap = mapOf(
-                    "First name" to user.firstName ,
-                    "last name" to user.lastName ,
-                    "email" to user.email ,
-                    "password" to user.password ,
-                    "level" to user.level
-                )
-                val db = Firebase.firestore
-                db.collection("Users").add(userMap)
-                    .addOnSuccessListener{
-                            DocumentReference ->
-                        Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ID: ${DocumentReference.id}")
-                        openDialog  = false
-                        Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
+                            db.collection("Users").document("${userMap["email"]}").set(userMap).addOnSuccessListener {
+                                Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ${userMap["email"]}")
+                                openDialog  = false
+                                Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
+                                navController.navigate(LoginPage.route)
+
+
+
+                            }.addOnFailureListener {
+                                openDialog = false
+                                Toast.makeText(context , "there's an issue happened try to Sign up Again" , Toast.LENGTH_SHORT).show()
+                            }
+//                    .add(userMap)
+//                    .addOnSuccessListener{
+//                            DocumentReference ->
+//                        Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ID: ${DocumentReference.id}")
+//                        openDialog  = false
+//                        Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
+//                        navController.navigate(LoginPage.route)
+//
+//                    }
+//                    .addOnFailureListener {exception ->
+//                        Log.w("From FireStore Cloud" , "Error adding document" , exception )
+//                    }
+
+
+                        }
+                        else {
+                            Log.w("Authentication Side Failure", "createUserWithEmail:failure", task.exception)
+                            openDialog = false
+                            Toast.makeText(context , "Authentication Failed because Internet Connection" ,Toast.LENGTH_SHORT ).show()
+
+                        }
 
                     }
-                    .addOnFailureListener {exception ->
-                        Log.w("From FireStore Cloud" , "Error adding document" , exception )
-                    }
 
+                }
 
-            }
-            else {
-                Log.w("Authentication Side Failure", "createUserWithEmail:failure", task.exception)
-                openDialog = false
-                Toast.makeText(context , "Authentication Failed because Internet Connection" ,Toast.LENGTH_SHORT ).show()
+            }.addOnFailureListener { expcetion ->
+                Toast.makeText(context , "$expcetion" , Toast.LENGTH_SHORT).show()
+                
 
             }
-
-        }
 
 
 
@@ -159,7 +188,7 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
     }
 
     fun isValidPassword(text:String):Boolean{
-        return text.matches(regex = Regex("^[^+_)(*&^%\$#@!\\\\\\\":?><]*\$"))
+        return text.matches(regex = Regex("^[^+_)(*&^%\\\$#@!\\\\\":?><]{6,}$"))
     }
 
     fun isValidSelected(text:String):Boolean{
@@ -429,7 +458,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 Text("Insert password")
                             }
                             else if ( !isValidPassword(password)) {
-                                Text("insert password only numbers ")
+                                Text("don't insert special symbol like +_)'(*&^%$#@!~\":?><' and the lowest number of the chacter is six")
                             }
                             else {
                                 isErrorPassword = false
@@ -564,6 +593,21 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
                             }
                             else {
+                                if (!isValidName(firstName) && firstName.isEmpty()){
+                                    isErrorFirstName = true
+                                }
+                                else if (!isValidName(lastName) && lastName.isEmpty() ){
+                                    isErrorLastName = true
+                                }
+                                else if (!isValidEmail(emailAddress) && emailAddress.isEmpty()){
+                                    isErrorEmailAddress = true
+                                }
+                                else if (!isValidPassword(password) && password.isEmpty()){
+                                    isErrorPassword = true
+                                }
+                                else  {
+                                    isErrorLevel = true
+                                }
 
 
                             }
@@ -592,7 +636,14 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                     .size(100.dp)
                                     .background(White, shape = RoundedCornerShape(8.dp))
                             ) {
-                                CircularProgressIndicator()
+                                Column(
+                                    verticalArrangement = Arrangement.Center
+                                ){
+                                    CircularProgressIndicator()
+                                    Text("Loading...")
+
+                                }
+
                             }
                         }
                     }
