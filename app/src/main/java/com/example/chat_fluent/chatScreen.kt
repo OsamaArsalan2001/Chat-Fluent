@@ -1,5 +1,6 @@
 package com.example.chat_fluent
 
+import android.inputmethodservice.Keyboard.Row
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -7,21 +8,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,14 +48,18 @@ import androidx.compose.ui.unit.sp
 fun chatscreen(modifier: Modifier, chatviewmodel: chatviewmodel) {
 
     Scaffold() {innnerpadding ->
-        com.example.chat_fluent.apphheader(modifier = Modifier.padding(innnerpadding))
+        apphheader(modifier = Modifier.padding(innnerpadding))
         messagelist(
             modifier = Modifier,
             messagelist = chatviewmodel.messagelist,
         )
-        messageInput(onMessageSend = {
+        BottomAppBar (tonalElevation = 10.dp
+        ) {Bottommessagebar {
             chatviewmodel.sendquestion(it)
-        })
+        }}
+//        messageInput(onMessageSend = {
+//            chatviewmodel.sendquestion(it)
+//        })
     }
 }
 
@@ -80,6 +90,83 @@ fun messagelist(modifier: Modifier, messagelist: List<messagemodel>){
     }
 
 }
+
+@Composable
+fun Bottommessagebar(onMessageSend : (String)-> Unit){
+    var message by remember {
+        mutableStateOf("")}
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+
+    ) {
+        Row (
+
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = message,
+                onValueChange = { message = it },
+                modifier = Modifier.weight(1f),
+                label = { Text("Message") },
+                singleLine = true,
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(onClick = {
+                if(message.isNotEmpty()){
+                    onMessageSend(message)
+                    message = ""}
+
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send ,
+                    contentDescription = "send")
+            }
+        }
+    }
+}
+
+
+
+
+
+
+@Composable
+fun messageInput(onMessageSend : (String)-> Unit){
+    var message by remember {
+        mutableStateOf("")
+    }
+
+    Row(modifier = Modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        OutlinedTextField(
+
+            modifier = Modifier.weight(1f).padding(bottom = 20.dp),
+            value = message,
+            onValueChange = {
+                message = it
+            })
+
+        IconButton(onClick = {
+            if(message.isNotEmpty()){
+                onMessageSend(message)
+                message = ""}
+
+        }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send ,
+                contentDescription = "send")
+        }
+
+    }
+
+}
+
 
 @Composable
 fun messagerow(messagemodel: messagemodel){
@@ -115,37 +202,6 @@ fun messagerow(messagemodel: messagemodel){
     }
 }
 
-
-@Composable
-fun messageInput(onMessageSend : (String)-> Unit){
-    var message by remember {
-        mutableStateOf("")
-    }
-
-    Row(modifier = Modifier.padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(
-
-            modifier = Modifier.weight(1f).padding(bottom = 20.dp),
-            value = message,
-            onValueChange = {
-                message = it
-            })
-
-        IconButton(onClick = {
-            if(message.isNotEmpty()){
-                onMessageSend(message)
-                message = ""}
-
-        }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send ,
-                contentDescription = "send")
-        }
-
-    }
-
-}
 
 @Composable
 fun apphheader(modifier: Modifier) {
