@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.chat_fluent.nav.MainScreen
 
 @Composable
 fun HomePageScreen(navController: NavController){
@@ -54,6 +55,9 @@ fun HomePageScreen(navController: NavController){
                 Color( red = 248 , green = 244 , blue = 252 )
 
             ),     onClick = {
+                navController.navigate(
+                    LoginPage.route
+                )
 
             }) {
                 Text("Log In" , style = TextStyle(
