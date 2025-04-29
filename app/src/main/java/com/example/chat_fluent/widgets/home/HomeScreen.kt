@@ -78,12 +78,12 @@ fun HomeScreen(navController: NavHostController) {
             ) {
                 Column {
                     Row {
-                        Text("Hi, Nouran", style = MaterialTheme.typography.headlineMedium)
-                        Icon(
-                            Icons.Default.WavingHand, contentDescription = "Chat", Modifier
-                                .size(35.dp)
-                                .padding(start = 5.dp), tint = Color.Yellow
-                        )
+                        Text("Hi, Nouran "+"\uD83D\uDC4B", style = MaterialTheme.typography.headlineMedium)
+//                        Icon(
+//                            Icons.Default.WavingHand, contentDescription = "Chat", Modifier
+//                                .size(35.dp)
+//                                .padding(start = 5.dp), tint = Color.Yellow
+//                        )
 
                     }
                     Text("Let's start learning!", style = Typography.titleMedium)

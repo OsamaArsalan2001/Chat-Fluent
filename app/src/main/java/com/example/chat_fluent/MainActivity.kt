@@ -52,7 +52,7 @@ fun MyApp(){
     var theme = remember { mutableStateOf(false) }
     val navController = rememberNavController()
     ChatfluentTheme {
-        NavHost(navController = navController, startDestination = MainScreen.route) {
+        NavHost(navController = navController, startDestination = HomePage.route) {
             composable(HomePage.route) {
                 HomePageScreen(navController)
             }
