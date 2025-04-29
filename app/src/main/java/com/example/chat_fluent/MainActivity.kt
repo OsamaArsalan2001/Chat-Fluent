@@ -49,7 +49,7 @@ fun GreetingPreview() {
 //
 @Composable
 fun MyApp(){
-    var theme = remember { mutableStateOf(false) }
+    //var theme = remember { mutableStateOf(false) }
     val navController = rememberNavController()
     ChatfluentTheme {
         NavHost(navController = navController, startDestination = HomePage.route) {
