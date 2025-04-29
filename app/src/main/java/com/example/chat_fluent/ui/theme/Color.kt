@@ -11,3 +11,11 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 val buttonColorSignup  = Color(alpha = 255 , red = 98 , green = 106 , blue = 231)
 val WhiteColor = Color(alpha = 255 , red= 243  , green = 244, blue =246)
+val Blue=Color(0xFF2563EB)
+val DarkerBlue=Color(0xFF3568D4)
+val LightBlue=Color(0xFFE3EDFF)
+val LightOrange=Color(0xFFFFDAAE)
+val Orange=Color(0xFFFE9519)
+
+
+

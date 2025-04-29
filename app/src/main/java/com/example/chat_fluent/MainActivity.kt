@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,21 +60,29 @@ fun GreetingPreview() {
 
 //
 @Composable
-fun MyApp(auth:FirebaseAuth){
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = HomePage.route){
-        composable(HomePage.route) {
-            HomePageScreen(navController)
-        }
 
+// fun MyApp(){
+//     var theme = remember { mutableStateOf(false) }
+
+fun MyApp(auth:FirebaseAuth){
+
+    val navController = rememberNavController()
+    ChatfluentTheme {
+        NavHost(navController = navController, startDestination = HomePage.route) {
+            composable(HomePage.route) {
+                HomePageScreen(navController)
+            }
+
+
+//             composable(SignupPage.route) {
+//                 signupScreen(navController)
 
         composable(SignupPage.route) {
             signupScreen(navController , auth)
 
-        }
-        composable(MainScreen.route) {
-            MainScreen()
-
+            }
+            composable(MainScreen.route) {
+                MainScreen()
         }
 
         composable(LoginPage.route) {
@@ -80,7 +90,12 @@ fun MyApp(auth:FirebaseAuth){
         }
 
 
+            composable(LoginPage.route) {
+                LoginScreen(navController)
+            }
 
+
+        }
     }
 
 }

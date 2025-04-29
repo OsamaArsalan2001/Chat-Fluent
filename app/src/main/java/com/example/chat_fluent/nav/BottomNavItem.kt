@@ -10,41 +10,42 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.chat_fluent.R
 
 sealed class BottomNavItem (
     val route: String,
     val label: String,
-    val selectedIcon: ImageVector,
-    val unSelectedIcon: ImageVector,
+    val selectedIcon: Int,
+    val unSelectedIcon: Int,
 
 ){
     object Home : BottomNavItem(
         route = "home",
         label = "Home",
-        selectedIcon=Icons.Filled.Home,
-        unSelectedIcon = Icons.Outlined.Home
+        selectedIcon= R.drawable.home,
+        unSelectedIcon = R.drawable.home
     )
-    object Practice : BottomNavItem(
-        route = "practice",
-        label = "Practice",
-        selectedIcon=Icons.Filled.List,
-        unSelectedIcon = Icons.Outlined.List
+    object Courses : BottomNavItem(
+        route = "courses",
+        label = "Courses",
+        selectedIcon=R.drawable.courses,
+        unSelectedIcon = R.drawable.courses
     )
-    object Feedback : BottomNavItem(
-        route = "feedback",
-        label = "Feedback",
-        selectedIcon=Icons.Filled.Info,
-        unSelectedIcon = Icons.Outlined.Info
+    object Topics : BottomNavItem(
+        route = "topics",
+        label = "Topics",
+        selectedIcon=R.drawable.document,
+        unSelectedIcon = R.drawable.document
     )
     object Profile : BottomNavItem(
         route = "profile",
         label = "Profile",
-        selectedIcon=Icons.Filled.Person,
-        unSelectedIcon = Icons.Outlined.Person
+        selectedIcon=R.drawable.user,
+        unSelectedIcon = R.drawable.user
     )
 
 
     companion object {
-        val items = listOf(Home,  Practice, Feedback, Profile,)
+        val items = listOf(Home,  Courses, Topics, Profile,)
     }
 }

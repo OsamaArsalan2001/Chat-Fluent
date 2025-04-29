@@ -16,14 +16,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.chat_fluent.ui.theme.Orange
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 
 @Composable
-fun BottomNavBar(navController: NavHostController) {
+fun BottomNavBar(navController: NavHostController, currentRoute: String?) {
     val items = BottomNavItem.items
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
@@ -32,27 +35,44 @@ fun BottomNavBar(navController: NavHostController) {
             NavigationBar(
                 containerColor = Color.White
             ) {
-                items.forEachIndexed { index, item ->
+                items.forEach {item ->
+                    val selected = currentRoute == item.route
+
                     NavigationBarItem(
-                        selected = selectedItemIndex == index,
+                        selected = selected,
+
+                        //selected = selectedItemIndex == index,
                         onClick = {
+                           // selectedItemIndex = index
+                            if (!selected) {
+
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        }
+                        /*onClick = {
                             selectedItemIndex = index
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId)
                                 launchSingleTop = true
                             }
-                        },
+                        }*/,
                         alwaysShowLabel = false,
                         icon = {
                             Icon(
-                                imageVector = if (index == selectedItemIndex) {
+                                painter = painterResource( if (selected) {
                                     item.selectedIcon
                                 } else {
                                     item.unSelectedIcon
-                                },
+                                }),
                                 contentDescription = item.label,
-                                tint = if (index == selectedItemIndex) {
-                                    buttonColorSignup // Selected icon color
+                                tint = if (selected) {
+                                    Orange // Selected icon color
                                 } else {
                                     Color.Gray // Unselected icon color
                                 }
@@ -79,3 +99,57 @@ fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     return navBackStackEntry?.destination?.route
 }*/
+///worked
+/*
+@Composable
+fun BottomNavBar(navController: NavHostController, currentRoute: String?) {
+    val items = BottomNavItem.items
+    var selectedItemIndex by rememberSaveable {
+        mutableStateOf(0)
+    }
+
+            NavigationBar(
+                containerColor = Color.White
+            ) {
+                items.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        selected = selectedItemIndex == index,
+                        onClick = {
+                            selectedItemIndex = index
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                        /*onClick = {
+                            selectedItemIndex = index
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        }*/,
+                        alwaysShowLabel = false,
+                        icon = {
+                            Icon(
+                                painter = painterResource( if (index == selectedItemIndex) {
+                                    item.selectedIcon
+                                } else {
+                                    item.unSelectedIcon
+                                }),
+                                contentDescription = item.label,
+                                tint = if (index == selectedItemIndex) {
+                                    Orange // Selected icon color
+                                } else {
+                                    Color.Gray // Unselected icon color
+                                }
+                            )
+                        },
+                        label = { Text(text = item.label) }
+                    )
+                }
+            }
+        }
+* */
