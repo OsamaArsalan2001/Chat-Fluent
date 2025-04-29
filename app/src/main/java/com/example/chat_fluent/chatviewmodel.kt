@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.chat_fluent.Models.messagemodel
 import com.example.chat_fluent.constants.apiKey
 import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
@@ -33,19 +34,19 @@ class chatviewmodel : ViewModel() {
                         content(it.role) {text(it.message)  }
                     }.toList()
                 )
-                messagelist.add(messagemodel(question , "user"))
-                messagelist.add(messagemodel("typing...." , "model"))
+                messagelist.add(messagemodel(question, "user"))
+                messagelist.add(messagemodel("typing....", "model"))
 
 
 
                 val response = chat.sendMessage(question)
                 messagelist.removeLast()
-                messagelist.add(messagemodel(response.text.toString() , "model"))
+                messagelist.add(messagemodel(response.text.toString(), "model"))
 
 
             }catch (e:Exception){
                 messagelist.removeLast()
-                messagelist.add(messagemodel("Error : "+e.message.toString(), "model"))
+                messagelist.add(messagemodel("Error : " + e.message.toString(), "model"))
             }
         }
     }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.chat_fluent.nav.SignupPage
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 import com.google.firebase.auth.FirebaseAuth
