@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -21,29 +19,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MailOutline
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,26 +50,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavController
 import com.example.chat_fluent.Models.User
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 import kotlin.text.Regex
 
 @SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
@@ -106,14 +87,16 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
     val db = Firebase.firestore
     suspend fun createUser(auth: FirebaseAuth , context:Context){
         // here I will put condition if the user register before or not by check the mal
-        val docRef = db.collection("Users").document("$emailAddress")
+        val docRef = db.collection("Users").document(emailAddress)
         docRef.get()
             .addOnSuccessListener {document ->
                 if (document != null ){
+                    Log.d("see the message" , "${document.data}")
                     Toast.makeText(context , "you register before by this mail " , Toast.LENGTH_SHORT).show()
                     openDialog = false
                 }
                 else {
+                    Log.d("see the message" , "we will insert data ")
                     auth.createUserWithEmailAndPassword(
                         emailAddress ,
                         password
@@ -132,6 +115,7 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
                                 Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ${userMap["email"]}")
                                 openDialog  = false
                                 Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
+                                Log.d("here he update the Message " , "Sign in successfully made")
                                 navController.navigate(LoginPage.route)
 
 
@@ -404,7 +388,9 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
                             }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.baseline_visibility_24) ,
+                                    painter = painterResource(
+                                        R.drawable.baseline_visibility_24
+                                    ) ,
                                     contentDescription = "hide"
                                 )
 

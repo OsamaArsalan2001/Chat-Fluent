@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
+import com.example.chat_fluent.R
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
