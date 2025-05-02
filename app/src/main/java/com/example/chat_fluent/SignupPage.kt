@@ -38,6 +38,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -535,7 +536,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                             checked= it
                         } ,
                         colors = CheckboxDefaults.colors(
-                            checkedColor = buttonColorSignup
+                            checkedColor = MaterialTheme.colorScheme.primary
                         )
 
 
@@ -561,12 +562,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                             top = 20.dp
                         ),
                         colors = ButtonDefaults.buttonColors(
-                            Color(
-                                alpha = 255,
-                                red = 98,
-                                green = 106,
-                                blue = 231
-                            )
+                            MaterialTheme.colorScheme.primary
                         ), onClick = {
 //                            navController.popBackStack()
                             if (
@@ -662,7 +658,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                             Text(
                                 "Log in" ,
                                 style = TextStyle(
-                                    color = buttonColorSignup
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             )
 

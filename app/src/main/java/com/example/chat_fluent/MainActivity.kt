@@ -61,9 +61,6 @@ fun GreetingPreview() {
 //
 @Composable
 
-// fun MyApp(){
-//     var theme = remember { mutableStateOf(false) }
-
 fun MyApp(auth:FirebaseAuth){
 
     val navController = rememberNavController()
@@ -89,10 +86,17 @@ fun MyApp(auth:FirebaseAuth){
             LoginScreen(navController , auth )
         }
 
+        composable(ChatScreen.route) {
+            val chatViewModel = chatviewmodel()
+            chatscreen(
+                modifier = Modifier,
+                chatviewmodel = chatViewModel
+            )
+        }
 
-            composable(LoginPage.route) {
-                LoginScreen(navController)
-            }
+
+
+
 
 
         }

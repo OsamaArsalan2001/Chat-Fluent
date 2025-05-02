@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -31,57 +32,64 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String?) {
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
+    Surface(
+        color = Color.White,
+        tonalElevation = NavigationBarDefaults.Elevation, // Maintains shadow
+    ) {
+        NavigationBar(
+            containerColor = Color.Transparent, // Let Surface handle color
+        )
+        {
+            items.forEach { item ->
+                val selected = currentRoute == item.route
 
-            NavigationBar(
-                containerColor = Color.White
-            ) {
-                items.forEach {item ->
-                    val selected = currentRoute == item.route
+                NavigationBarItem(
+                    selected = selected,
 
-                    NavigationBarItem(
-                        selected = selected,
+                    //selected = selectedItemIndex == index,
+                    onClick = {
+                        // selectedItemIndex = index
+                        if (!selected) {
 
-                        //selected = selectedItemIndex == index,
-                        onClick = {
-                           // selectedItemIndex = index
-                            if (!selected) {
-
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
-                        /*onClick = {
+                    }
+                    /*onClick = {
                             selectedItemIndex = index
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId)
                                 launchSingleTop = true
                             }
                         }*/,
-                        alwaysShowLabel = false,
-                        icon = {
-                            Icon(
-                                painter = painterResource( if (selected) {
+                    alwaysShowLabel = false,
+                    icon = {
+                        Icon(
+                            painter = painterResource(
+                                if (selected) {
                                     item.selectedIcon
                                 } else {
                                     item.unSelectedIcon
-                                }),
-                                contentDescription = item.label,
-                                tint = if (selected) {
-                                    Orange // Selected icon color
-                                } else {
-                                    Color.Gray // Unselected icon color
                                 }
-                            )
-                        },
-                        label = { Text(text = item.label) }
-                    )
-                }
+                            ),
+                            contentDescription = item.label,
+                            tint = if (selected) {
+                                Orange // Selected icon color
+                            } else {
+                                Color.Gray // Unselected icon color
+                            }
+                        )
+                    },
+                    label = { Text(text = item.label) }
+                )
             }
+        }
+    }
         }
 
 

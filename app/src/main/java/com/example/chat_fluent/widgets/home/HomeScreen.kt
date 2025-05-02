@@ -98,6 +98,7 @@ fun HomeScreen(navController: NavHostController) {
             }
             Spacer(modifier = Modifier.height(24.dp))
             // Study Hours Card
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(4.dp),
