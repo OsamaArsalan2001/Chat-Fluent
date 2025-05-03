@@ -20,6 +20,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -218,12 +219,7 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                         top = 20.dp
                     ),
                     colors = ButtonDefaults.buttonColors(
-                        Color(
-                            alpha = 255,
-                            red = 98,
-                            green = 106,
-                            blue = 231
-                        )
+                        MaterialTheme.colorScheme.primary
                     ), onClick = {
                         navController.popBackStack()
                     }) {
@@ -248,7 +244,7 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                         Text(
                             "Sign Up" ,
                             style = TextStyle(
-                                color = buttonColorSignup
+                                color = MaterialTheme.colorScheme.primary
                             )
                         )
 

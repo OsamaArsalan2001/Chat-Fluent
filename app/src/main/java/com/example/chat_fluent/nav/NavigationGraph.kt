@@ -1,4 +1,4 @@
-package com.example.chat_fluent.nav
+package com.example.chat_fluent
 
 sealed interface Destination {
      val route:String
@@ -17,12 +17,6 @@ object LoginPage: Destination{
 }
 object MainScreen: Destination{
     override val route: String = "Main"
-}
-object PracticeScreen: Destination{
-    override val route: String = "Practice"
-}
-object FeedbackScreen: Destination{
-    override val route: String = "Feedback"
 }
 /*
 object HomeScreen: Destination{

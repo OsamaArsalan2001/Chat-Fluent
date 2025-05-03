@@ -41,7 +41,7 @@ fun LearningProgressBar(
     ) {
         CircularProgressIndicator(
             progress = 1f,
-            color = LightBlue,
+            color = MaterialTheme.colorScheme.surface,
             strokeWidth = 10.dp,
             modifier = Modifier.size(70.dp)
         )
