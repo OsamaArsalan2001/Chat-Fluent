@@ -1,4 +1,4 @@
-package com.example.chat_fluent.Models
+package com.example.chat_fluent.models
 
 data class User(
     val firstName:String ,

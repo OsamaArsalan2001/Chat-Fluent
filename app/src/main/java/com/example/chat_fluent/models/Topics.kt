@@ -1,4 +1,4 @@
-package com.example.chat_fluent.widgets.home
+package com.example.chat_fluent.models
 
 import androidx.annotation.DrawableRes
 

@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import com.example.chat_fluent.ui.theme.Blue
 import com.example.chat_fluent.ui.theme.LightOrange
 import com.example.chat_fluent.ui.theme.Orange
-import com.example.chat_fluent.widgets.home.Courses
-import com.example.chat_fluent.widgets.home.Topics
+import com.example.chat_fluent.models.Courses
+import com.example.chat_fluent.models.Topics
 
 @Composable
 fun TopicsCard(index:Int,topic: Topics,isSelected: Boolean = false,

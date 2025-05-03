@@ -21,6 +21,12 @@ object MainScreen: Destination{
 object ChatScreen: Destination {
     override val route: String = "Chat"
 }
+object ChatScreenWithTopic: Destination {
+    override val route: String = "Chat"
+    const val TOPIC_ARG = "topic"
+
+    fun createRoute(topic: String) = "chat/$topic"
+}
 /*
 object HomeScreen: Destination{
     override val route: String = "HomeScreen"

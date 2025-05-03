@@ -1,13 +1,11 @@
 package com.example.chat_fluent
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chat_fluent.constants.apiKey
-import com.google.ai.client.generativeai.BuildConfig
+import com.example.chat_fluent.Constants.GEMINI_API_KEY
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.launch
@@ -21,7 +19,7 @@ class chatviewmodel : ViewModel() {
 
     val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-pro-latest",
-        apiKey = apiKey
+        apiKey = GEMINI_API_KEY
     )
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun sendquestion(question : String){

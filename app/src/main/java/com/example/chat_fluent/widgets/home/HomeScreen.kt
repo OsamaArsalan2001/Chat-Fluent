@@ -37,7 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.chat_fluent.ChatScreen
+import com.example.chat_fluent.ChatScreenWithTopic
 import com.example.chat_fluent.R
+import com.example.chat_fluent.models.Courses
+import com.example.chat_fluent.models.Topics
 import com.example.chat_fluent.ui.theme.Typography
 
 @Composable
@@ -47,20 +51,20 @@ fun HomeScreen(navController: NavHostController) {
 
     val progress by remember { mutableStateOf(0.75f) }
     val courses = listOf(
-        Courses("Grammar", duration = "2 Hours", imageRes =  R.drawable.grammar),
-        Courses("Writting",duration ="3 Hours",imageRes = R.drawable.writing),
-        Courses("Listening",duration ="2 Hours",imageRes = R.drawable.listening),
-        Courses("Speaking",duration ="2 Hours",imageRes = R.drawable.speaking),
+        Courses("Grammar", duration = "2 Hours", imageRes = R.drawable.grammar),
+        Courses("Writting", duration = "3 Hours", imageRes = R.drawable.writing),
+        Courses("Listening", duration = "2 Hours", imageRes = R.drawable.listening),
+        Courses("Speaking", duration = "2 Hours", imageRes = R.drawable.speaking),
 
         )
 
 
         val topics = listOf(
-        Topics("Travel", imageRes = R.drawable.travel),
-        Topics("Business",imageRes =  R.drawable.business),
-        Topics("Academic", imageRes = R.drawable.academic),
-        Topics("User Experience",imageRes =  R.drawable.travel),
-        Topics("Practice", imageRes = R.drawable.practice)
+            Topics("Travel", imageRes = R.drawable.travel),
+            Topics("Business", imageRes = R.drawable.business),
+            Topics("Academic", imageRes = R.drawable.academic),
+            Topics("User Experience", imageRes = R.drawable.travel),
+            Topics("Practice", imageRes = R.drawable.practice)
     )
     Scaffold { padding ->
         Column(
@@ -196,7 +200,11 @@ fun HomeScreen(navController: NavHostController) {
                             course = course.name,
                             imageRes = course.imageRes,
                             isSelected = index == selectedTopicIndex,
-                            onClick = { selectedTopicIndex = index })
+                            onClick = { selectedTopicIndex = index
+                                selectedTopicIndex = index
+                                navController.navigate(ChatScreenWithTopic.createRoute(course.name)) {
+                                    popUpTo("Home") { saveState = true }
+                                    launchSingleTop = true}})
                     }
 
                 }

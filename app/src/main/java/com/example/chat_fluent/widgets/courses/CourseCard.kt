@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.example.chat_fluent.ui.theme.Blue
 import com.example.chat_fluent.ui.theme.LightOrange
 import com.example.chat_fluent.ui.theme.Orange
-import com.example.chat_fluent.widgets.home.Courses
+import com.example.chat_fluent.models.Courses
 
 @Composable
 fun CourseCard(index:Int,course: Courses,isSelected: Boolean = false,

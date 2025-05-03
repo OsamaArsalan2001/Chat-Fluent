@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chat_fluent.R
-import com.example.chat_fluent.widgets.home.Courses
+import com.example.chat_fluent.models.Courses
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

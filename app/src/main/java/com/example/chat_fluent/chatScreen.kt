@@ -187,14 +187,14 @@ fun messagerow(messagemodel: messagemodel){
 
                     )
                     .clip(RoundedCornerShape(48f))
-                    .background(if (ismodel) Color.Blue else Color.Green)
+                    .background(if (ismodel) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary)
                     .padding(16.dp)
             ) {
                 SelectionContainer {
                     Text(
                         text = messagemodel.message,
                         fontWeight = FontWeight.W500,
-                        color = Color.White
+                        color = if(ismodel)Color.Black else MaterialTheme.colorScheme.background
                     )
                 }
             }
