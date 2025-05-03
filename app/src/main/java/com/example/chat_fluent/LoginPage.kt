@@ -46,9 +46,11 @@ import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
 import com.example.chat_fluent.R
 import com.google.firebase.auth.FirebaseAuth
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 
 @Composable
-fun LoginScreen(navController: NavController , auth: FirebaseAuth){
+fun LoginScreen(navController: NavController , supabaseClient:   SupabaseClient){
     var emailAddress by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("")}
     var checked by remember { mutableStateOf(true) }

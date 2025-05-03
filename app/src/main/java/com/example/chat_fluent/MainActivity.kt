@@ -16,9 +16,25 @@ import com.example.chat_fluent.ui.theme.ChatfluentTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 
 class MainActivity : ComponentActivity() {
-    private  var auth: FirebaseAuth = Firebase.auth
+//    private  var auth: FirebaseAuth = Firebase.auth
+    val supabase = createSupabaseClient(
+        supabaseUrl = "https://ozsjpolwvdviqcmovfpv.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96c2pwb2x3dmR2aXFjbW92ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMTI5MjMsImV4cCI6MjA2MTY4ODkyM30.HWjVY61YD2R4_s3Sk87Xma20GYuEKrI6VJsCU_blIXo"
+    ) {
+        install(Auth)
+        install(Postgrest)
+        //install other modules
+    }
+
+
+
 
 
 
@@ -27,7 +43,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApp(auth)
+            MyApp(supabase)
         }
     }
 }
@@ -51,7 +67,7 @@ fun GreetingPreview() {
 
 //
 @Composable
-fun MyApp(auth:FirebaseAuth){
+fun MyApp(supabase:   SupabaseClient){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HomePage.route){
         composable(HomePage.route) {
@@ -60,7 +76,7 @@ fun MyApp(auth:FirebaseAuth){
 
 
         composable(SignupPage.route) {
-            signupScreen(navController , auth)
+            signupScreen(navController , supabase)
 
         }
         composable(MainScreen.route) {
@@ -69,7 +85,7 @@ fun MyApp(auth:FirebaseAuth){
         }
 
         composable(LoginPage.route) {
-            LoginScreen(navController , auth )
+            LoginScreen(navController , supabase )
         }
 
 
