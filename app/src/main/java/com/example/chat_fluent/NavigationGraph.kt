@@ -18,10 +18,11 @@ object LoginPage: Destination{
 object MainScreen: Destination{
     override val route: String = "Main"
 }
-/*
-object HomeScreen: Destination{
-    override val route: String = "HomeScreen"
+
+object StartPage: Destination{
+    override val route: String = "StartPage"
 }
+/*
 object ProfileScreen: Destination{
     override val route: String = "Profile"
 }

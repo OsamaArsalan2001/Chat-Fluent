@@ -1,12 +1,18 @@
 package com.example.chat_fluent
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -28,11 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,17 +51,98 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
+import com.example.chat_fluent.R
 import com.google.firebase.auth.FirebaseAuth
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavController , auth: FirebaseAuth){
+fun LoginScreen(navController: NavController , supabase:   SupabaseClient){
+    val context:Context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var emailAddress by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("")}
+    var isErrorEmailAddress by remember { mutableStateOf(false) }
+    var passwordEmail by remember { mutableStateOf("")}
+    var isErrorPassword by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(true) }
     var showPassword by remember { mutableStateOf(false) }
+    var openDialog by remember { mutableStateOf(false) }
+    fun isValidEmail(text:String):Boolean{
+        return text.matches(regex = Regex("[a-zA-Z]+[0-9]*@gmail\\.com"))
+    }
+
+    fun isValidPassword(text:String):Boolean{
+        return text.matches(regex = Regex("^[^+_)(*&^%\\\$#!\\\\\":?><]{6,}$"))
+    }
+    suspend fun userAuthentication(){
+        try {
+            val result = supabase.auth.signInWith(Email) {
+                email = "${emailAddress.lowercase()}"
+                password = "${passwordEmail}"
+            }
+
+
+            supabase.auth.sessionStatus.collect {
+                when (it) {
+                    is SessionStatus.Authenticated -> {
+                        println("Received new authenticated session.")
+                        when (it.source) { //Check the source of the session
+                            SessionSource.External -> {}
+                            is SessionSource.Refresh -> {}
+                            is SessionSource.SignIn -> {
+                                navController.navigate(StartPage.route)
+
+                            }
+
+                            is SessionSource.SignUp -> {
+                                // finish this tomorrow and it will work an sall
+                            }
+
+                            SessionSource.Storage -> {}
+                            SessionSource.Unknown -> {}
+                            is SessionSource.UserChanged -> {}
+                            is SessionSource.UserIdentitiesChanged -> {}
+                            SessionSource.AnonymousSignIn -> {}
+                        }
+                    }
+
+                    SessionStatus.Initializing -> println("Initializing")
+                    is SessionStatus.RefreshFailure -> {
+                        openDialog = false
+                        Toast.makeText(context, "${it.cause}", Toast.LENGTH_SHORT).show()
+                    } //Either a network error or a internal server error
+                    is SessionStatus.NotAuthenticated -> {
+                        if (it.isSignOut) {
+                            println("User signed out")
+                        } else {
+
+                            Toast.makeText(
+                                context,
+                                "it's wrong email or password",
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        catch (e: Exception){
+            Log.d("Exception" , "{${e.toString()}}")
+            Toast.makeText(context , "you enter the email or password wrong" , Toast.LENGTH_SHORT).show()
+        }
+
+    }
     Column(
         modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.Center , horizontalAlignment = Alignment.CenterHorizontally  ){
         Column(
@@ -104,6 +195,12 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                     value = emailAddress ,
                     onValueChange = {
                             newText -> emailAddress = newText
+                        if(isValidEmail(emailAddress) && emailAddress.isNotEmpty()){
+                            isErrorEmailAddress = false
+                        }
+                        else {
+                            isErrorEmailAddress = true
+                        }
                     } ,
                     placeholder = {
                         Text("Enter your Email")
@@ -117,7 +214,23 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                         focusedIndicatorColor = Color.Transparent ,
                         unfocusedIndicatorColor = Color.Transparent
 
-                    )
+                    ) ,
+                    isError = isErrorEmailAddress ,
+                    supportingText = {
+                        if (isErrorEmailAddress){
+                            if (emailAddress.isEmpty()){
+                                Text("Insert Email")
+                            }
+                            else if (!isValidEmail(emailAddress)) {
+                                Text("insert by the pattern like osamaHelal@gmail.com")
+                            }
+                            else {
+                                isErrorEmailAddress = false
+                            }
+
+                        }
+
+                    }
                 )
                 TextField(
                     modifier = Modifier
@@ -163,9 +276,15 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                     },
 
                     shape = RectangleShape  ,
-                    value = password ,
+                    value = passwordEmail ,
                     onValueChange = {
-                            newText -> password = newText
+                            newText -> passwordEmail = newText
+                        if(isValidPassword(passwordEmail) && passwordEmail.isNotEmpty()){
+                            isErrorPassword = false
+                        }
+                        else {
+                            isErrorPassword = true
+                        }
                     } ,
                     placeholder = {
                         Text("Create Your password")
@@ -180,6 +299,21 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                         unfocusedIndicatorColor = Color.Transparent
 
                     ) ,
+                    isError = isErrorPassword ,
+                    supportingText = {
+                        if (isErrorPassword){
+                            if (passwordEmail.isEmpty()){
+                                Text("Insert password")
+                            }
+                            else if ( !isValidPassword(passwordEmail)) {
+                                Text("don't insert special symbol like +_)'(*&^%$#@!~\":?><' and the lowest number of the chacter is six")
+                            }
+                            else {
+                                isErrorPassword = false
+                            }
+
+                        }
+                    }
 
 
                     )
@@ -224,7 +358,31 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                             blue = 231
                         )
                     ), onClick = {
-                        navController.popBackStack()
+                        if (
+                            (isValidEmail(emailAddress) && emailAddress.isNotEmpty() ) && (isValidPassword(passwordEmail) && (passwordEmail.isNotEmpty()))
+
+                        ){
+                            isErrorEmailAddress = false
+                            isErrorPassword = false
+                            openDialog = true
+                            scope.launch{
+                                userAuthentication()
+
+                            }
+
+                        }
+                        else {
+                            if (!isValidEmail(emailAddress) && emailAddress.isEmpty()){
+                                isErrorEmailAddress = true
+                            }
+                            else {
+
+                                    isErrorPassword = true
+
+                            }
+                            openDialog = false
+
+                        }
                     }) {
                     Text(
                         "Log in", style = TextStyle(
@@ -251,6 +409,29 @@ fun LoginScreen(navController: NavController , auth: FirebaseAuth){
                             )
                         )
 
+                    }
+                    if(openDialog){
+                        Dialog(
+                            onDismissRequest = { openDialog = false },
+                            DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+                        ) {
+
+                            Box(
+                                contentAlignment= Alignment.Center,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .background(White, shape = RoundedCornerShape(8.dp))
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center
+                                ){
+                                    CircularProgressIndicator()
+                                    Text("Loading...")
+
+                                }
+
+                            }
+                        }
                     }
 
                 }
