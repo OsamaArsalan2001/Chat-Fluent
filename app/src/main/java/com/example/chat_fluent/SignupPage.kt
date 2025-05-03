@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -21,29 +19,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.outlined.AccountBox
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MailOutline
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,33 +50,37 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavController
 import com.example.chat_fluent.Models.User
+import com.example.chat_fluent.Models.UserList
 import com.example.chat_fluent.ui.theme.WhiteColor
 import com.example.chat_fluent.ui.theme.buttonColorSignup
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.text.Regex
 
 @SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @Composable
-fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
+fun signupScreen(navController: NavController , supabase:   SupabaseClient ,){
     val context:Context = LocalContext.current
-     lateinit var user : User
+//     lateinit var user : User
     val scope = rememberCoroutineScope()
     var openDialog by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
@@ -97,87 +89,85 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
     var isErrorLastName by remember { mutableStateOf(false) }
     var emailAddress by remember { mutableStateOf("") }
     var isErrorEmailAddress by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf("") }
+    var passwordEmail by remember { mutableStateOf("") }
     var isErrorPassword by remember { mutableStateOf(false) }
     var level by remember { mutableStateOf("") }
     var isErrorLevel by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(true) }
     var showPassword by remember { mutableStateOf(false) }
-    val db = Firebase.firestore
-    suspend fun createUser(auth: FirebaseAuth , context:Context){
+
+    suspend fun createUser(supabase:   SupabaseClient , context:Context){
         // here I will put condition if the user register before or not by check the mal
-        val docRef = db.collection("Users").document("$emailAddress")
-        docRef.get()
-            .addOnSuccessListener {document ->
-                if (document != null ){
-                    Toast.makeText(context , "you register before by this mail " , Toast.LENGTH_SHORT).show()
-                    openDialog = false
-                }
-                else {
-                    auth.createUserWithEmailAndPassword(
-                        emailAddress ,
-                        password
-                    ).addOnCompleteListener { task ->
-                        if (task.isSuccessful){
-                            Log.d("Authentication Side Success", "createUserWithEmail:success")
-                            val userMap = mapOf(
-                                "First name" to user.firstName ,
-                                "last name" to user.lastName ,
-                                "email" to user.email ,
-                                "password" to user.password ,
-                                "level" to user.level
-                            )
-
-                            db.collection("Users").document("${userMap["email"]}").set(userMap).addOnSuccessListener {
-                                Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ${userMap["email"]}")
-                                openDialog  = false
-                                Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
-                                navController.navigate(LoginPage.route)
-
-
-
-                            }.addOnFailureListener {
-                                openDialog = false
-                                Toast.makeText(context , "there's an issue happened try to Sign up Again" , Toast.LENGTH_SHORT).show()
-                            }
-//                    .add(userMap)
-//                    .addOnSuccessListener{
-//                            DocumentReference ->
-//                        Log.d("From FireStore Cloud Success" , "DocumentSnapshot added with ID: ${DocumentReference.id}")
-//                        openDialog  = false
-//                        Toast.makeText(context , "successfully Sign up " ,Toast.LENGTH_SHORT ).show()
-//                        navController.navigate(LoginPage.route)
-//
-//                    }
-//                    .addOnFailureListener {exception ->
-//                        Log.w("From FireStore Cloud" , "Error adding document" , exception )
-//                    }
-
-
-                        }
-                        else {
-                            Log.w("Authentication Side Failure", "createUserWithEmail:failure", task.exception)
-                            openDialog = false
-                            Toast.makeText(context , "Authentication Failed because Internet Connection" ,Toast.LENGTH_SHORT ).show()
-
-                        }
-
-                    }
-
-                }
-
-            }.addOnFailureListener { expcetion ->
-                Toast.makeText(context , "$expcetion" , Toast.LENGTH_SHORT).show()
-                
+        val checkUser = supabase.from("Users").select(columns = Columns.list("firstName" , "lastName" , "email" , "password" , "level")) {
+            filter {
+                User::email eq "${emailAddress.lowercase()}"
+                //or
 
             }
 
+        }
+        val users = Json.decodeFromString<List<User>>(checkUser.data)
 
 
+        if (users.isNotEmpty()){
+            Log.d("this is the result of the checkUser" , "${users.elementAt(0).email}")
+            openDialog = false
+            Toast.makeText(context , "you enter this mail before " , Toast.LENGTH_SHORT).show()
+        }
 
 
+        else {
+            val user = supabase.auth.signUpWith(Email) {
+                email = "${emailAddress.lowercase()}"
+                password = "${passwordEmail}"
+            }
+            supabase.auth.sessionStatus.collect {
+                when (it) {
+                    is SessionStatus.Authenticated -> {
+                        println("Received new authenticated session.")
+                        when (it.source) { //Check the source of the session
+                            SessionSource.External -> {}
+                            is SessionSource.Refresh -> {}
+                            is SessionSource.SignIn -> {}
+                            is SessionSource.SignUp -> {
+                                // finish this tomorrow and it will work an sallah
+                                val user = User(
+                                    firstName = firstName,
+                                    lastName = lastName,
+                                    email = emailAddress.lowercase(),
+                                    password = passwordEmail,
+                                    level = level
+                                )
+                                supabase.from("Users").insert(user)
+                                openDialog = false
+                                navController.navigate(LoginPage.route)
 
 
+                            }
+
+                            SessionSource.Storage -> {}
+                            SessionSource.Unknown -> {}
+                            is SessionSource.UserChanged -> {}
+                            is SessionSource.UserIdentitiesChanged -> {}
+                            SessionSource.AnonymousSignIn -> {}
+                        }
+                    }
+
+                    SessionStatus.Initializing -> println("Initializing")
+                    is SessionStatus.RefreshFailure -> {
+                        openDialog = false
+                        Toast.makeText(context, "${it.cause}", Toast.LENGTH_SHORT).show()
+                    } //Either a network error or a internal server error
+                    is SessionStatus.NotAuthenticated -> {
+                        if (it.isSignOut) {
+                            println("User signed out")
+                        } else {
+                            println("User not signed in")
+                        }
+                    }
+                }
+            }
+        }
     }
     fun isValidName(text:String):Boolean{
         return text.matches(regex = Regex("[a-zA-Z]{3,}"))
@@ -188,7 +178,7 @@ fun signupScreen(navController: NavController , auth: FirebaseAuth ,){
     }
 
     fun isValidPassword(text:String):Boolean{
-        return text.matches(regex = Regex("^[^+_)(*&^%\\\$#@!\\\\\":?><]{6,}$"))
+        return text.matches(regex = Regex("^[^+_)(*&^%\\\$#!\\\\\":?><]{6,}$"))
     }
 
     fun isValidSelected(text:String):Boolean{
@@ -404,7 +394,9 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 
                             }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.baseline_visibility_24) ,
+                                    painter = painterResource(
+                                        R.drawable.baseline_visibility_24
+                                    ) ,
                                     contentDescription = "hide"
                                 )
 
@@ -427,10 +419,10 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     },
 
                     shape = RectangleShape  ,
-                    value = password ,
+                    value = passwordEmail ,
                     onValueChange = {
-                            newText -> password = newText
-                        if(isValidPassword(password) && password.isNotEmpty()){
+                            newText -> passwordEmail = newText
+                        if(isValidPassword(passwordEmail) && passwordEmail.isNotEmpty()){
                             isErrorPassword = false
                         }
                         else {
@@ -454,10 +446,10 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                     isError = isErrorPassword ,
                     supportingText = {
                         if (isErrorPassword){
-                            if (password.isEmpty()){
+                            if (passwordEmail.isEmpty()){
                                 Text("Insert password")
                             }
-                            else if ( !isValidPassword(password)) {
+                            else if ( !isValidPassword(passwordEmail)) {
                                 Text("don't insert special symbol like +_)'(*&^%$#@!~\":?><' and the lowest number of the chacter is six")
                             }
                             else {
@@ -570,10 +562,10 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                         ), onClick = {
 //                            navController.popBackStack()
                             if (
-                                (isValidName(firstName) && firstName.isNotEmpty()) && isValidName(lastName) && lastName.isNotEmpty() && (isValidEmail(emailAddress) && emailAddress.isNotEmpty() ) && (isValidPassword(password) && (password.isNotEmpty())) &&
+                                (isValidName(firstName) && firstName.isNotEmpty()) && isValidName(lastName) && lastName.isNotEmpty() && (isValidEmail(emailAddress) && emailAddress.isNotEmpty() ) && (isValidPassword(passwordEmail) && (passwordEmail.isNotEmpty())) &&
                                 (isValidSelected(level) && level.isNotEmpty())
                                 ){
-                                user = User(firstName = firstName , lastName = lastName , email = emailAddress , password = password , level = level)
+//                                user = User(firstName = firstName , lastName = lastName , email = emailAddress , password = passwordEmail , level = level)
                                 isErrorFirstName = false
                                 isErrorFirstName = false
                                 isErrorEmailAddress = false
@@ -582,7 +574,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
 //                                navController.popBackStack()
                                 openDialog = true
                                     scope.launch{
-                                        createUser(auth , context)
+                                        createUser(supabase , context)
 
                                     }
 
@@ -602,7 +594,7 @@ modifier = Modifier.fillMaxSize() , verticalArrangement = Arrangement.SpaceEvenl
                                 else if (!isValidEmail(emailAddress) && emailAddress.isEmpty()){
                                     isErrorEmailAddress = true
                                 }
-                                else if (!isValidPassword(password) && password.isEmpty()){
+                                else if (!isValidPassword(passwordEmail) && passwordEmail.isEmpty()){
                                     isErrorPassword = true
                                 }
                                 else  {

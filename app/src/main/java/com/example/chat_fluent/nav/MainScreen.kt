@@ -61,11 +61,11 @@ fun MainScreen() {
                 }
             ) }
 
-            }
-            }
-
-
+        }
     }
+
+
+}
 //
 //@Composable
 //fun BottomNavBar(navController: NavController, currentRoute: String?) {
