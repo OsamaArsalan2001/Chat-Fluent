@@ -87,6 +87,10 @@ fun MyApp(supabase:   SupabaseClient){
         composable(LoginPage.route) {
             LoginScreen(navController , supabase )
         }
+        composable (StartPage.route){
+            HomeScreen()
+
+        }
 
 
 

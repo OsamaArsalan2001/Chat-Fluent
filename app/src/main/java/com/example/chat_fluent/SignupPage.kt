@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -117,8 +118,8 @@ fun signupScreen(navController: NavController , supabase:   SupabaseClient ,){
 
         else {
             val user = supabase.auth.signUpWith(Email) {
-                email = "${emailAddress}"
-                password = "${passwordEmail.lowercase()}"
+                email = "${emailAddress.lowercase()}"
+                password = "${passwordEmail}"
             }
             supabase.auth.sessionStatus.collect {
                 when (it) {
@@ -139,6 +140,7 @@ fun signupScreen(navController: NavController , supabase:   SupabaseClient ,){
                                 )
                                 supabase.from("Users").insert(user)
                                 openDialog = false
+                                navController.navigate(LoginPage.route)
 
 
                             }
