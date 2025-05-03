@@ -1,5 +1,6 @@
 package com.example.chat_fluent
 
+import android.annotation.SuppressLint
 import android.inputmethodservice.Keyboard.Row
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -19,9 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +32,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,25 +47,58 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chat_fluent.Models.messagemodel
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun chatscreen(modifier: Modifier, chatviewmodel: chatviewmodel) {
 
-    Scaffold() {innnerpadding ->
-        apphheader(modifier = Modifier.padding(innnerpadding))
-        messagelist(
-            modifier = Modifier,
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {Text("chat screen")},
+                modifier = Modifier,
+                navigationIcon = { IconButton(onClick = {})
+                {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "back",
+                    )
+                } },
+                actions = {
+                    TextButton (onClick = {})
+                    {
+                        Text("Get feedback")
+                    }
+                },
+
+                )
+        },
+        content = { messagelist(
+            modifier = Modifier.padding(top = 100.dp),
             messagelist = chatviewmodel.messagelist,
-        )
-        BottomAppBar (tonalElevation = 10.dp
-        ) {Bottommessagebar {
-            chatviewmodel.sendquestion(it)
-        }}
+        )},
+        bottomBar = {
+            Bottommessagebar {
+                chatviewmodel.sendquestion(it)
+            }
+        }
+    )
+    //{
+//        apphheader(modifier = Modifier.padding(innnerpadding))
+//        messagelist(
+//            modifier = Modifier.padding(innnerpadding),
+//            messagelist = chatviewmodel.messagelist,
+//        )
+//        BottomAppBar  {Bottommessagebar {
+//            chatviewmodel.sendquestion(it)
+//        }}
 //        messageInput(onMessageSend = {
 //            chatviewmodel.sendquestion(it)
 //        })
-    }
+    //   }
 }
 
 @Composable
@@ -101,7 +139,7 @@ fun Bottommessagebar(onMessageSend : (String)-> Unit){
             .fillMaxWidth()
             .padding(8.dp),
 
-    ) {
+        ) {
         Row (
 
             modifier = Modifier.padding(8.dp),
@@ -114,7 +152,15 @@ fun Bottommessagebar(onMessageSend : (String)-> Unit){
                 label = { Text("Message") },
                 singleLine = true,
             )
+            Spacer(modifier = Modifier.width(8.dp))
 
+            IconButton(onClick = {
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.android_microphone),
+                    contentDescription = "send voice ",
+                )
+            }
             Spacer(modifier = Modifier.width(8.dp))
 
             IconButton(onClick = {
@@ -127,6 +173,7 @@ fun Bottommessagebar(onMessageSend : (String)-> Unit){
                     imageVector = Icons.AutoMirrored.Filled.Send ,
                     contentDescription = "send")
             }
+
         }
     }
 }
@@ -146,7 +193,9 @@ fun messageInput(onMessageSend : (String)-> Unit){
         verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
 
-            modifier = Modifier.weight(1f).padding(bottom = 20.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 20.dp),
             value = message,
             onValueChange = {
                 message = it
@@ -203,21 +252,23 @@ fun messagerow(messagemodel: messagemodel){
 }
 
 
+/*
 @Composable
 fun apphheader(modifier: Modifier) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = "chat",
-            color = Color.White,
-            fontSize = 12.sp
+Box(
+modifier = Modifier
+.fillMaxWidth()
+.background(MaterialTheme.colorScheme.primary)
+) {
+Text(
+modifier = Modifier.padding(16.dp),
+text = "chat",
+color = Color.White,
+fontSize = 12.sp
 
 
-        )
-    }
+)
+}
 
 }
+*/

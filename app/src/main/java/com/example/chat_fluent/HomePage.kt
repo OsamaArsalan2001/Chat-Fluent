@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +20,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.chat_fluent.nav.MainScreen
+import com.example.chat_fluent.nav.LoginPage
+import com.example.chat_fluent.nav.SignupPage
 
 @Composable
 fun HomePageScreen(navController: NavController){
@@ -44,7 +46,7 @@ fun HomePageScreen(navController: NavController){
         ) {
             Button( shape = RoundedCornerShape(10.dp)   ,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp , vertical = 20.dp) ,
-                colors = ButtonDefaults.buttonColors(Color(alpha = 255 , red = 98 , green = 106 , blue = 231)),  onClick = {
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),  onClick = {
                     navController.navigate(SignupPage.route)
                 }) {
                 Text("Sign up" , style = TextStyle(
@@ -52,7 +54,7 @@ fun HomePageScreen(navController: NavController){
                 ))
             }
             Button( shape = RoundedCornerShape(10.dp)   , modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp )  , colors = ButtonDefaults.buttonColors(
-                Color( red = 248 , green = 244 , blue = 252 )
+                MaterialTheme.colorScheme.secondary
 
             ),     onClick = {
                 navController.navigate(
@@ -62,7 +64,7 @@ fun HomePageScreen(navController: NavController){
             }) {
                 Text("Log In" , style = TextStyle(
                     fontSize = 30.sp ,
-                    color = Color(alpha = 255 , red = 98 , green = 106 , blue = 231)
+                    color = MaterialTheme.colorScheme.primary
                 )
                 )
             }
