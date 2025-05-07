@@ -47,19 +47,40 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun chatscreen(modifier: Modifier, chatviewmodel: chatviewmodel) {
 
-    Scaffold() {innnerpadding ->
-        apphheader(modifier = Modifier.padding(innnerpadding))
-        messagelist(
-            modifier = Modifier,
-            messagelist = chatviewmodel.messagelist,
-        )
-        BottomAppBar (tonalElevation = 10.dp
-        ) {Bottommessagebar {
-            chatviewmodel.sendquestion(it)
-        }}
-//        messageInput(onMessageSend = {
+//    Scaffold() {innnerpadding ->
+//        apphheader(modifier = Modifier.padding(innnerpadding))
+//        messagelist(
+//            modifier = Modifier,
+//            messagelist = chatviewmodel.messagelist,
+//        )
+//        BottomAppBar (tonalElevation = 10.dp
+//        ) {Bottommessagebar {
 //            chatviewmodel.sendquestion(it)
-//        })
+//        }}
+////        messageInput(onMessageSend = {
+////            chatviewmodel.sendquestion(it)
+////        })
+//    }
+    Scaffold(
+        topBar = { apphheader(modifier = Modifier) },
+        bottomBar = {
+            BottomAppBar(tonalElevation = 10.dp) {
+                Bottommessagebar {
+                    chatviewmodel.sendquestion(it)
+                }
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            messagelist(
+                modifier = Modifier.weight(1f),
+                messagelist = chatviewmodel.messagelist,
+            )
+        }
     }
 }
 

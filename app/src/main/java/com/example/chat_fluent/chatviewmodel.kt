@@ -18,7 +18,7 @@ class chatviewmodel : ViewModel() {
     }
 
     val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-pro-latest",
+        modelName = "gemini-2.0-flash",
         apiKey = GEMINI_API_KEY
     )
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -37,12 +37,16 @@ class chatviewmodel : ViewModel() {
 
 
                 val response = chat.sendMessage(question)
-                messagelist.removeLast()
+                messagelist.removeAt(messagelist.size - 1)
+
+               // messagelist.removeLast()
                 messagelist.add(messagemodel(response.text.toString() , "model"))
 
 
             }catch (e:Exception){
-                messagelist.removeLast()
+                messagelist.removeAt(messagelist.size - 1)
+
+                //messagelist.removeLast()
                 messagelist.add(messagemodel("Error : "+e.message.toString(), "model"))
             }
         }
