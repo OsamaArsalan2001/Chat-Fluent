@@ -76,10 +76,14 @@ class OpenAIChatRepository(
                 _conversationHistory.update { history ->
                     history + userMessage
                 }
+                val initialMessage = promptBuilder.buildPrompt(userInput = message,topic = null, history = _conversationHistory.value)
+
                 // Create request with full history
-                val messages = listOf(
-                    Message(content = "You are a helpful assistant.", role = "system")
-                ) + _conversationHistory.value
+                val messages =initialMessage
+                    //this work
+//                    listOf(
+//                    Message(content = "You are a helpful a chinese assistant, so answer all questions in chinese even if the question is in english.", role = "system")
+//                ) + _conversationHistory.value
 
                 val request = ChatRequest(
                     messages = ArrayList(messages),
@@ -158,7 +162,7 @@ class OpenAIChatRepository(
     ): Result<TutorResponse> {
 
         return try {
-            val message = promptBuilder.buildPrompt(userInput, topic, history)
+            val message = promptBuilder.buildPrompt(userInput, topic, emptyList())
             // Make API call through remoteSource
             val choices = remoteSource.getTutorResponseFromNetwork(
                 ChatRequest(messages = message)

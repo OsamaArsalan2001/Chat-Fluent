@@ -54,7 +54,7 @@ object EnglishTutorPrompt {
     fun buildPrompt(
         userInput: String,
         topic: String?,
-        history: List<String> = emptyList()
+        history: List<Message> = emptyList()
     ): List<Message> {
         val historyContext = history.takeLast(3).joinToString("\n")
         val topicPlaceholder = topic ?: "general daily life"
