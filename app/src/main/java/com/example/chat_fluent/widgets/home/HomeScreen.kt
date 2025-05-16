@@ -15,8 +15,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.WavingHand
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.chat_fluent.ChatScreen
 import com.example.chat_fluent.ChatScreenWithTopic
 import com.example.chat_fluent.R
 import com.example.chat_fluent.models.Courses
@@ -45,7 +42,7 @@ import com.example.chat_fluent.models.Topics
 import com.example.chat_fluent.ui.theme.Typography
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(bottomNavController: NavHostController) {
     var selectedTopicIndex by remember { mutableStateOf(-1) }
     var selectedCourseIndex by remember { mutableStateOf(-1) }
 
@@ -96,7 +93,8 @@ fun HomeScreen(navController: NavHostController) {
                     painter = painterResource(R.drawable.feedback), contentDescription = "Chat", Modifier
                         .background(  color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
                         .size(40.dp)
-                        .padding(5.dp), tint = Color.White
+                        .padding(5.dp), tint = Color.White,
+
                 )
                 // Text("9:41", style = MaterialTheme.typography.bodyMedium)
             }
@@ -121,7 +119,10 @@ fun HomeScreen(navController: NavHostController) {
                         Text("How many hours you studied this week",
                             style = MaterialTheme.typography.headlineMedium)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { /* Handle start */ }) {
+                        Button(onClick = { /* Handle start */
+                            bottomNavController.navigate("temp")
+
+                        }) {
                             Text("Let's start")
                         }
                     }
@@ -142,7 +143,7 @@ fun HomeScreen(navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically){
                 Text("Basic Courses", style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f,fill = true))
-                TextButton(onClick = {navController.navigate("courses") {
+                TextButton(onClick = {bottomNavController.navigate("courses") {
                     // Preserve home state in back stack
                     popUpTo("home") { saveState = true }
                     launchSingleTop = true
@@ -179,7 +180,7 @@ fun HomeScreen(navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically){
                 Text("Topics", style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f,fill = true))
-                TextButton(onClick = {navController.navigate("topics") {
+                TextButton(onClick = {bottomNavController.navigate("topics") {
                     // Preserve home state in back stack
                     popUpTo("home") { saveState = true }
                     launchSingleTop = true
@@ -202,7 +203,7 @@ fun HomeScreen(navController: NavHostController) {
                             isSelected = index == selectedTopicIndex,
                             onClick = { selectedTopicIndex = index
                                 selectedTopicIndex = index
-                                navController.navigate(ChatScreenWithTopic.createRoute(course.name)) {
+                                bottomNavController.navigate(ChatScreenWithTopic.createRoute(course.name)) {
                                     popUpTo("Home") { saveState = true }
                                     launchSingleTop = true}})
                     }

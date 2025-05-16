@@ -1,41 +1,53 @@
 package com.example.chat_fluent
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.chat_fluent.chatbot.ChatRepository
-import com.example.chat_fluent.chatbot.view.GeminiChatScreen
-import com.example.chat_fluent.chatbot.viewmodel.GeminiChatViewModel
-import com.example.chat_fluent.data.network.gemini.GeminiApiService
+import com.example.chat_fluent.OpenAIChatScreen
+import com.example.chat_fluent.chatbot.OpenAIChatRepository
+import com.example.chat_fluent.chatbot.view.OpenAIChatScreen
+import com.example.chat_fluent.chatbot.viewmodel.OpenAIChatViewModel
+import com.example.chat_fluent.data.network.gemini.OpenAIApiService
+import com.example.chat_fluent.data.network.gemini.prompts.EnglishTutorPrompt
 import com.example.chat_fluent.nav.MainScreen
 import com.example.chat_fluent.ui.theme.ChatfluentTheme
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.example.chat_fluent.widgets.home.HomeScreen
+//import com.google.firebase.auth.FirebaseAuth
+//import com.google.firebase.auth.ktx.auth
+//import com.google.firebase.ktx.Firebase
+//import io.github.jan.supabase.SupabaseClient
+//import io.github.jan.supabase.auth.Auth
+//import io.github.jan.supabase.auth.auth
+//import io.github.jan.supabase.createSupabaseClient
+//import io.github.jan.supabase.postgrest.Postgrest
 
 class MainActivity : ComponentActivity() {
-    private  var auth: FirebaseAuth = Firebase.auth
+//    private  var auth: FirebaseAuth = Firebase.auth
+//    val supabase = createSupabaseClient(
+//        supabaseUrl = "https://ozsjpolwvdviqcmovfpv.supabase.co",
+//        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96c2pwb2x3dmR2aXFjbW92ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMTI5MjMsImV4cCI6MjA2MTY4ODkyM30.HWjVY61YD2R4_s3Sk87Xma20GYuEKrI6VJsCU_blIXo"
+//    ) {
+//        install(Auth)
+//        install(Postgrest)
+//        //install other modules
+//    }
+
+
+
 
 
 
@@ -44,7 +56,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApp(auth)
+            MyApp(/*supabase*/)
         }
     }
 }
@@ -69,75 +81,56 @@ fun GreetingPreview() {
 //
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
-
-fun MyApp(auth:FirebaseAuth){
-
+fun MyApp(/*supabase:   SupabaseClient*/){
     val navController = rememberNavController()
     ChatfluentTheme {
-        NavHost(navController = navController, startDestination = ChatScreen.route) {
-            composable(HomePage.route) {
-                HomePageScreen(navController)
-            }
-
-
-//             composable(SignupPage.route) {
-//                 signupScreen(navController)
-
-        composable(SignupPage.route) {
-            signupScreen(navController , auth)
-
-            }
-            composable(MainScreen.route) {
+        NavHost(navController = navController, startDestination = StartPage.route) {
+//            composable(route = HomePage.route) {
+//                HomePageScreen(navController)
+//            }
+//            composable(route = ChatScreen.route) {
+//                val chatViewModel = chatviewmodel()
+//                chatscreen(chatViewModel)
+//            }
+//
+//
+//            composable(SignupPage.route) {
+//                signupScreen(navController, supabase)
+//
+//            }
+//            composable(MainScreen.route) {
+//                MainScreen()
+//
+//            }
+//
+//            composable(LoginPage.route) {
+//                LoginScreen(navController, supabase)
+//            }
+            composable(StartPage.route) {
                 MainScreen()
-        }
 
-        composable(LoginPage.route) {
-            LoginScreen(navController , auth )
-        }
-
-        composable(ChatScreen.route) {
-            val chatViewModel = chatviewmodel()
-            chatscreen(
-                modifier = Modifier,
-                chatviewmodel = chatViewModel
-            )
-        }
-            // Add this new composable for the parameterized route
+            }
 //            composable(
-//                route = "${ChatScreen.route}/{${ChatScreenWithTopic.TOPIC_ARG}}",
+//                route = OpenAIChatScreen.route,
 //                arguments = listOf(
-//                    navArgument(ChatScreenWithTopic.TOPIC_ARG) { type = NavType.StringType }
+//                    navArgument("topic") {
+//                        type = NavType.StringType
+//                        nullable = true
+//                    }
 //                )
 //            ) { backStackEntry ->
-//                val topic = backStackEntry.arguments?.getString(ChatScreenWithTopic.TOPIC_ARG) ?: ""
-//                val chatViewModel = chatviewmodel()
-//                chatViewModel.setTopic(topic)
-//                chatscreen(
-//                    modifier = Modifier,
-//                    chatviewmodel = chatViewModel
-//                )
-//            }
-//            composable(ChatScreen.route) {
-//                val chatViewModel = GeminiChatViewModel(ChatRepository.getInstance(GeminiApiService.getInstance(),LocalContext.current))
-//                GeminiChatScreen(
-//                    modifier = Modifier,
-//                    viewModel = chatViewModel
+//                val topic = backStackEntry.arguments?.getString("topic")
+//                OpenAIChatScreen(
+//                    onBackClick = { navController.popBackStack() },
+//                    topic = topic
 //                )
 //            }
 
-            composable(ChatScreen.route) {
-                val chatViewModel = chatviewmodel()
-                chatscreen(
-                    modifier = Modifier,
-                    chatviewmodel = chatViewModel
-                )
-            }
 
-
-
+        }
 
 
         }
     }
 
-}
+

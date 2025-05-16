@@ -1,6 +1,6 @@
 package com.example.chat_fluent.data.network.gemini.prompts
 
-import com.example.chat_fluent.data.network.gemini.prompts.EnglishTutorPrompt.BASE_PROMPT
+import com.example.chat_fluent.models.Message
 
 object EnglishTutorPrompt {
     const val BASE_PROMPT = """
@@ -55,13 +55,23 @@ object EnglishTutorPrompt {
         userInput: String,
         topic: String?,
         history: List<String> = emptyList()
-    ): String {
+    ): List<Message> {
         val historyContext = history.takeLast(3).joinToString("\n")
         val topicPlaceholder = topic ?: "general daily life"
-        return BASE_PROMPT
-            .replace("%HISTORY%", historyContext)
-            .replace("%INPUT%", userInput)
-            .replace("%TOPIC%", topicPlaceholder)
+        return listOf(
+            Message(
+                role = "system",
+                content = BASE_PROMPT.replace("%TOPIC%", topicPlaceholder)
+            ),
+            Message(
+                role = "user",
+                content = "Context:\n$historyContext\n\nNew message:\n$userInput"
+            )
+        )
+//        return BASE_PROMPT
+//            .replace("%HISTORY%", historyContext)
+//            .replace("%INPUT%", userInput)
+//            .replace("%TOPIC%", topicPlaceholder)
     }
 
     fun getTopicIntroductionPrompt(topic: String): String {

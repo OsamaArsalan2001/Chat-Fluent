@@ -1,0 +1,329 @@
+package com.example.chat_fluent.chatbot
+
+import android.util.Log
+import com.example.chat_fluent.Constants
+import com.example.chat_fluent.data.network.gemini.OpenAIRemoteSource
+import com.example.chat_fluent.data.network.gemini.RetrofitHelper
+import com.example.chat_fluent.data.network.gemini.prompts.EnglishTutorPrompt
+import com.example.chat_fluent.data.network.gemini.prompts.FeedbackPrompt
+import com.example.chat_fluent.models.Message
+import com.example.chat_fluent.models.ChatRequest
+import com.example.chat_fluent.models.ChatResponse
+import com.example.chat_fluent.models.Choice
+import com.example.chat_fluent.models.FeedbackResponse
+import com.example.chat_fluent.models.TutorResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import okhttp3.Callback
+import okhttp3.Dispatcher
+import retrofit2.Call
+import retrofit2.Response
+
+class OpenAIChatRepository(
+    private val remoteSource: OpenAIRemoteSource,
+    private val promptBuilder: EnglishTutorPrompt
+) : IOpenAIChatRepository {
+
+    private val apiClient= RetrofitHelper.getInstance()
+    private val _conversationHistory = MutableStateFlow<List<Message>>(emptyList())
+    val conversationHistory: StateFlow<List<Message>> = _conversationHistory.asStateFlow()
+
+    override fun getConversationHistory(): Flow<List<Message>> = _conversationHistory.asStateFlow()
+    override fun getTopicIntroductionPrompt(topic: String): String {
+        return promptBuilder.getTopicIntroductionPrompt(topic)
+
+    }
+
+    // 1. Get initial prompt through API
+    override suspend fun getInitialPrompt(topic: String?): Result<String> {
+        return try {
+            val prompt = promptBuilder.buildPrompt(
+                userInput = "",
+                topic = topic,
+                history = emptyList()
+            )
+
+            val choices = remoteSource.getTutorResponseFromNetwork(
+                ChatRequest(
+                    messages = prompt,
+                    model = TODO()
+                )
+            ).first()
+
+            if (choices.isEmpty()) {
+                return Result.failure(Exception("Empty response from API"))
+            }
+
+            val response = parseResponse(choices.first())
+            Result.success(response.tutorMessage)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to get initial prompt: ${e.message}"))
+        }
+    }
+
+    override fun createChatCompelation(message: String) {
+            try {
+                // Add user message to history
+                val userMessage = Message(content = message, role = "user")
+                _conversationHistory.update { history ->
+                    history + userMessage
+                }
+                // Create request with full history
+                val messages = listOf(
+                    Message(content = "You are a helpful assistant.", role = "system")
+                ) + _conversationHistory.value
+
+                val request = ChatRequest(
+                    messages = ArrayList(messages),
+                    model = Constants.OPEN_AI_MODEL
+                )
+
+//                val request= ChatRequest(arrayListOf(
+//                    Message(content = "Hi who are you?", role = "system"),
+//                    Message(content = message, role = "user")
+//                ),
+//                    Constants.OPEN_AI_MODEL
+//                    )
+    apiClient.getTutorResponse(request).enqueue(object : retrofit2.Callback<ChatResponse>{
+        override fun onResponse(
+            call: Call<ChatResponse?>,
+            response: Response<ChatResponse?>
+        ) {
+            if (response.isSuccessful) {
+                response.body()?.choices?.firstOrNull()?.message?.let { assistantMessage ->
+                    // Add assistant response to history
+                    _conversationHistory.update { history ->
+                        history + assistantMessage
+                    }
+                    Log.d("ChatHistory", "Updated history: ${_conversationHistory.value}")
+                }}
+            val code=response.code()
+          /*  if (code==200){
+                response.body()?.choices?.get(0)?.message?.let {
+                    Log.d("message",it.toString())
+                }
+            }*/
+            if (code == 429) {
+                Log.e("OpenAITest", "API quota exceeded - check your OpenAI account billing")
+            }else{
+                Log.d("error",response.errorBody().toString())
+
+            }
+        }
+
+        override fun onFailure(
+            call: Call<ChatResponse?>,
+            t: Throwable
+        ) {
+            t.printStackTrace()
+        }
+
+    })
+            }catch (e: Exception)
+            {
+                e.printStackTrace()
+            }
+
+
+    }
+
+    companion object {
+        private var instance: OpenAIChatRepository? = null
+        fun getInstance(
+            remoteSource: OpenAIRemoteSource,
+            promptBuilder: EnglishTutorPrompt
+
+        ): OpenAIChatRepository {
+            return instance ?: synchronized(this) {
+                val temp = OpenAIChatRepository(remoteSource, promptBuilder)
+                instance = temp
+                temp
+            }
+        }
+
+    }
+
+    override suspend fun sendMessage(
+        userInput: String,
+        topic: String?,
+        history: List<String>
+    ): Result<TutorResponse> {
+
+        return try {
+            val message = promptBuilder.buildPrompt(userInput, topic, history)
+            // Make API call through remoteSource
+            val choices = remoteSource.getTutorResponseFromNetwork(
+                ChatRequest(messages = message)
+            ).first()
+
+            if (choices.isEmpty()) {
+                return Result.failure(Exception("Empty response from API"))
+            }
+
+            val firstChoice = choices.first()
+            val jsonResponse = parseResponse(firstChoice)
+            updateHistory(userInput, jsonResponse.tutorMessage)
+            Result.success(jsonResponse)
+
+        } catch (e: Exception) {
+            Result.failure(Exception("API call failed: ${e.message}"))
+        }
+    }
+
+//        val message = promptBuilder.buildPrompt(userInput, topic, history)
+//        // Make API call
+//        val response = remoteSource.getTutorResponseFromNetwork(
+//            ChatRequest(messages = message)
+//        )            // Parse response
+//        return response
+//
+//
+//
+//    }
+
+//        return try {
+//            val message= promptBuilder.buildPrompt(userInput,topic,history)
+//            // Make API call
+//            val response = apiService.getTutorResponse(
+//                ChatRequest(messages = message)
+//            )            // Parse response
+//
+//            response.body()?.let { apiResponse ->
+//                val jsonResponse = parseResponse(apiResponse)
+//                updateHistory(userInput, jsonResponse.tutorMessage)
+//                Result.success(jsonResponse)
+//            } ?: Result.failure(Exception("Empty response"))
+//
+//        } catch (e: Exception) {
+//            Result.failure(Exception("API call failed: ${e.message}"))
+//        }
+//
+//        }
+//    private fun parseResponse(response: ChatResponse): TutorResponse {
+//        return try {
+//            // Try to parse as JSON first
+//            Json.decodeFromString<TutorResponse>(response.choices.first().message.content)
+//        } catch (e: Exception) {
+//            // Fallback to simple text response
+//            TutorResponse(
+//                tutorMessage = response.choices.first().message.content,
+//                correction = null
+//            )
+//        }
+//    }
+private fun parseResponse(choice: Choice): TutorResponse {
+    return try {
+        // Try to parse as JSON first
+        Json.decodeFromString<TutorResponse>(choice.message.content)
+    } catch (e: Exception) {
+        // Fallback to simple text response
+        TutorResponse(
+            tutorMessage = choice.message.content,
+            correction = null
+        )
+    }
+}
+
+    private suspend fun updateHistory(userInput: String, tutorMessage: String?) {
+//        val newHistory = _conversationHistory.value.toMutableList().apply {
+//            add(userInput)
+//            tutorMessage?.let { add(it) }
+//            // Keep only last 10 exchanges (20 messages)
+//            if (size > 20) removeAt(0)
+//        }
+//        _conversationHistory.emit(newHistory)
+//        _conversationHistory.update { history ->
+//            (history + userInput + (tutorMessage ?: ""))
+//                .takeLast(20) // Keep last 10 exchanges (20 messages)
+//        }
+    }
+
+//    override suspend fun generateFeedback(
+//        conversationHistory: List<String>,
+//        userLevel: String
+//    ): Result<FeedbackResponse> {
+//        return try {
+//            // Build feedback prompt using the FeedbackPrompt object
+//            val feedbackPrompt = FeedbackPrompt.build(userLevel, conversationHistory)
+//            val messages = listOf(
+//                ChatMessage(role = "user", content = feedbackPrompt)
+//            )
+//
+//            val response = apiService.getTutorResponse(ChatRequest(messages = messages))
+//
+//            response.body()?.let { apiResponse ->
+//                val feedbackResponse = parseFeedbackResponse(apiResponse)
+//                Result.success(feedbackResponse)
+//            } ?: Result.failure(Exception("Empty feedback response"))
+//        } catch (e: Exception) {
+//            Result.failure(Exception("Feedback generation failed: ${e.message}"))
+//        }
+//    }
+override suspend fun generateFeedback(
+    conversationHistory: List<String>,
+    userLevel: String
+): Result<FeedbackResponse> {
+    return try {
+        // Build feedback prompt
+        val feedbackPrompt = FeedbackPrompt.build(userLevel, conversationHistory)
+        val messages = listOf(
+            Message(role = "user", content = feedbackPrompt)
+        )
+
+        // Make API call through remoteSource
+        val choices = remoteSource.getTutorResponseFromNetwork(
+            ChatRequest(messages = messages)
+        ).first()
+
+        if (choices.isEmpty()) {
+            return Result.failure(Exception("Empty feedback response"))
+        }
+
+        val feedbackResponse = parseFeedbackResponse(choices.first())
+        Result.success(feedbackResponse)
+    } catch (e: Exception) {
+        Result.failure(Exception("Feedback generation failed: ${e.message}"))
+    }
+}
+
+//    private fun parseFeedbackResponse(response: ChatResponse): FeedbackResponse {
+//        return try {
+//            // The API response should contain the JSON structure we requested in FeedbackPrompt
+//            Json.decodeFromString<FeedbackResponse>(response.choices.first().message.content)
+//        } catch (e: Exception) {
+//            // Fallback to empty feedback if parsing fails
+//            FeedbackResponse(
+//                categories = emptyMap(),
+//                cefrLevel = "B1",
+//                strengths = emptyList(),
+//                weaknesses = emptyList(),
+//                studyPlan = emptyList()
+//            )
+//        }
+//    }
+
+    private fun parseFeedbackResponse(choice: Choice): FeedbackResponse {
+        return try {
+            Json.decodeFromString<FeedbackResponse>(choice.message.content)
+        } catch (e: Exception) {
+            // Fallback to empty feedback if parsing fails
+            FeedbackResponse(
+                categories = emptyMap(),
+                cefrLevel = "B1",
+                strengths = emptyList(),
+                weaknesses = emptyList(),
+                studyPlan = emptyList()
+            )
+        }
+    }
+
+
+}

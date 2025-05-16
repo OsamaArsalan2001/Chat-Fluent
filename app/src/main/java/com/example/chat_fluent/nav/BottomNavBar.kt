@@ -90,7 +90,7 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String?) {
             }
         }
     }
-        }
+}
 
 
 

@@ -1,8 +1,12 @@
 package com.example.chat_fluent.models
 
+import com.google.gson.annotations.SerializedName
+
 //@Serializable
 data class TutorResponse(
+    @SerializedName("tutorMessage")
     val tutorMessage: String,       // Natural language response
+    @SerializedName("correction")
     val correction: Correction?     // Null if no errors
 )
 

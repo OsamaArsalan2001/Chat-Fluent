@@ -1,9 +1,9 @@
 package com.example.chat_fluent.models
 
-data class ChatMessage(
-    val message: String,
+data class Message(
+    val content: String,
     val role: String,  // "user" or "model"
     //val timestamp: Long = System.currentTimeMillis()  // For sorting
-    val errors: List<LanguageError> = emptyList()  // Linked corrections
+   // val errors: List<LanguageError> = emptyList()  // Linked corrections
 
 )

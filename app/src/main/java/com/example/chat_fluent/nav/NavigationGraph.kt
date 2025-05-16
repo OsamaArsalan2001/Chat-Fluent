@@ -18,19 +18,27 @@ object LoginPage: Destination{
 object MainScreen: Destination{
     override val route: String = "Main"
 }
+
+object StartPage: Destination{
+    override val route: String = "StartPage"
+}
 object ChatScreen: Destination {
-    override val route: String = "Chat"
+    override val route: String = "chat"
+}
+object OpenAIChatScreen : Destination {
+    override val route: String = "openai_chat"
+    const val TOPIC_ARG = "topic"
+    fun createRoute(topic: String? = null) = if (topic != null) "$route/$topic" else route
 }
 object ChatScreenWithTopic: Destination {
-    override val route: String = "Chat"
+    override val route: String = "ChatM"
     const val TOPIC_ARG = "topic"
 
     fun createRoute(topic: String) = "chat/$topic"
 }
+
+
 /*
-object HomeScreen: Destination{
-    override val route: String = "HomeScreen"
-}
 object ProfileScreen: Destination{
     override val route: String = "Profile"
 }

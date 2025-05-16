@@ -6,41 +6,47 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
+import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.widgets.topics.TopicsScreen
 
 import com.example.chat_fluent.widgets.home.HomeScreen
 import com.example.chat_fluent.widgets.courses.CoursesScreen
 import com.example.chat_fluent.ProfileScreen
+import com.example.chat_fluent.chatbot.view.OpenAIChatScreen
+import com.example.chat_fluent.chatbot.view.OpenAITestScreen
+import com.example.chat_fluent.chatbot.viewmodel.OpenAIChatViewModel
+//import com.example.chat_fluent.chatscreen
+//import com.example.chat_fluent.chatviewmodel
 
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val bottomNavController = rememberNavController()
+    val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
 
     Scaffold(
-        containerColor = Color.White,
         modifier = Modifier
             .fillMaxSize(),
-        bottomBar = { BottomNavBar(navController, currentRoute = currentRoute
+        bottomBar = { BottomNavBar(bottomNavController, currentRoute = currentRoute
         ) }
     ) { innerPadding ->
         NavHost(
-            navController = navController,
+            navController = bottomNavController,
             startDestination = BottomNavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ){
-            composable(BottomNavItem.Home.route) { HomeScreen(navController) }
-            composable(BottomNavItem.Topics.route) { TopicsScreen( navController = navController,
+            composable(BottomNavItem.Home.route) { HomeScreen(bottomNavController) }
+            composable(BottomNavItem.Topics.route) { TopicsScreen( navController = bottomNavController,
                 onBack = {
                     // Navigate to home and reset the back stack
-                    navController.navigate(BottomNavItem.Home.route) {
+                    bottomNavController.navigate(BottomNavItem.Home.route) {
                         popUpTo(BottomNavItem.Home.route) {
                             inclusive = true
                         }
@@ -50,10 +56,10 @@ fun MainScreen() {
                 }) }
             composable(BottomNavItem.Profile.route) { ProfileScreen() }
             composable(BottomNavItem.Courses.route) { CoursesScreen(
-                navController = navController,
+                navController = bottomNavController,
                 onBack = {
                     // Navigate to home and reset the back stack
-                    navController.navigate(BottomNavItem.Home.route) {
+                    bottomNavController.navigate(BottomNavItem.Home.route) {
                         popUpTo(BottomNavItem.Home.route) {
                             inclusive = true
                         }
@@ -63,11 +69,52 @@ fun MainScreen() {
                 }
             ) }
 
+            // Add chat screen to main navigation
+//            composable("chat") {
+//                val chatViewModel = chatviewmodel()
+//                chatscreen(chatViewModel)
+//            }
+//            composable("openai_chat") {
+//                val chatViewModel = OpenAIChatViewModel()
+//                OpenAIChatScreen(chatViewModel)
+//            }
+            composable(
+                route = OpenAIChatScreen.route,
+                arguments = listOf(
+                    navArgument("topic") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) { backStackEntry ->
+                val topic = backStackEntry.arguments?.getString("topic")
+                OpenAIChatScreen(
+                    onBackClick = {
+                        bottomNavController.navigate(BottomNavItem.Home.route) {
+                            popUpTo(BottomNavItem.Home.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    topic = topic,
+                    onFeedbackClick =   {bottomNavController.navigate(BottomNavItem.Home.route) {
+                        popUpTo(BottomNavItem.Home.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }}
+                )
             }
+            composable("temp") {
+                OpenAITestScreen()
             }
 
-
+        }
     }
+
+
+}
 //
 //@Composable
 //fun BottomNavBar(navController: NavController, currentRoute: String?) {

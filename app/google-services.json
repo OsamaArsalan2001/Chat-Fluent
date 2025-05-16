@@ -1,4 +1,4 @@
- {
+{
   "project_info": {
     "project_number": "845809267182",
     "project_id": "chat-fluent",
@@ -10,6 +10,25 @@
         "mobilesdk_app_id": "1:845809267182:android:c29e66e8e81bf1b715deff",
         "android_client_info": {
           "package_name": "com.example.chat_fluent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmqJYUunPVH4d_xxnruRtT9vrHPWjDL5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845809267182:android:6e717a539e3367f215deff",
+        "android_client_info": {
+          "package_name": "com.example.chat_fluentv2"
         }
       },
       "oauth_client": [],
