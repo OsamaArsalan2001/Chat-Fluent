@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.chat_fluent.FeedbackScreen
 import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.widgets.topics.TopicsScreen
 
@@ -132,7 +133,7 @@ fun MainScreen() {
                         launchSingleTop = true
                     }},
                     topic = topic,
-                    onFeedbackClick = { /* ... */ }
+                    onFeedbackClick = { bottomNavController.navigate(FeedbackScreen.route) }
                 )
             }
 //            composable(

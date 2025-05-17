@@ -1,10 +1,10 @@
 package com.example.chat_fluent.chatbot.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat_fluent.chatbot.IOpenAIChatRepository
 import com.example.chat_fluent.models.Message
+import com.example.chat_fluent.utilities.ApiResult
 import com.example.chat_fluent.utilities.ChatApiState
 import com.example.chat_fluent.utilities.FeedbackApiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +48,21 @@ class OpenAIChatViewModel(private val openAIChatRepository: IOpenAIChatRepositor
     fun createChatCompelation(message: String)
     {
         openAIChatRepository.createChatCompelation(message)
+    }
+    fun generateFeedback() {
+        _feedback.value = FeedbackApiState.Loading
+        viewModelScope.launch {
+            val result = openAIChatRepository.generateFeedback()
+            when (result) {
+                is ApiResult.Success -> {
+                    _feedback.value = FeedbackApiState.Success(result.data)
+                }
+
+                is ApiResult.Failure -> {
+                    _feedback.value = FeedbackApiState.Failure(result.exception)
+                }
+            }
+        }
     }
 //    private fun sendInitialPrompt(topic: String? = null) {
 //        viewModelScope.launch {

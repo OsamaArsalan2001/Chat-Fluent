@@ -39,6 +39,9 @@ object ChatScreenWithTopic: Destination {
 
     fun createRoute(topic: String) = "chat/$topic"
 }
+object FeedbackScreen: Destination {
+    override val route: String = "feedback"
+}
 
 
 /*

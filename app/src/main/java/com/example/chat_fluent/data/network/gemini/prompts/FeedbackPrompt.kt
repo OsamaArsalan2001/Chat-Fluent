@@ -26,11 +26,11 @@ object FeedbackPrompt {
         }"""
 
     fun build(
-        userLevel: String,
+        /*userLevel: String,*/
         conversationHistory: List<String>
     ): String {
         return FEEDBACKTEMPLATE.format(
-            userLevel,
+            /*userLevel,*/
             conversationHistory.takeLast(6).joinToString("\n")
         )
     }
