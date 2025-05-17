@@ -43,6 +43,124 @@ class OpenAIChatRepository(
     val conversationHistory: StateFlow<List<Message>> = _conversationHistory.asStateFlow()
 
     override fun getConversationHistory(): Flow<List<Message>> = _conversationHistory.asStateFlow()
+    override suspend fun initializeChat(topic: String?) {
+        // Use empty user input to trigger greeting
+        val prompt = promptBuilder.buildPrompt(
+            userInput = "",
+            topic = topic,
+            history = emptyList()
+        )
+        Log.d("ChatRepo", "Initializing chat with topic: $topic")
+        Log.d("ChatRepo", "Prompt: ${prompt.joinToString("\n") { it.content }}")
+        val request = ChatRequest(
+            messages = prompt,
+            model = Constants.OPEN_AI_MODEL
+        )
+        try {
+            apiClient.getTutorResponse(request).enqueue(object : retrofit2.Callback<ChatResponse>{
+                override fun onResponse(
+                    call: Call<ChatResponse?>,
+                    response: Response<ChatResponse?>
+                ){
+                    Log.d("ChatRepo", "Response code: ${response.code()}")
+
+                    if (response.isSuccessful) {
+                        response.body()?.let { apiResponse ->
+                            val tutorResponse = parseTutorResponse(apiResponse)
+                            if (tutorResponse != null) {
+                                Log.d("ChatRepo", "Parsed response: $tutorResponse")
+                                _conversationHistory.update {
+                                    listOf(
+                                        Message(
+                                            role = "assistant",
+                                            content = tutorResponse.tutorMessage,
+                                            correction = tutorResponse.correction
+                                        )
+                                    )
+                                }
+                            } else {
+                                Log.e("ChatRepo", "Failed to parse tutor response")
+                                showFallbackGreeting()
+                            }
+                        } ?: run {
+                            Log.e("ChatRepo", "Empty response body")
+                            showFallbackGreeting()
+                        }
+                    } else {
+                        Log.e("ChatRepo", "API call failed: ${response.errorBody()?.string()}")
+                        showFallbackGreeting()
+                    }
+                }
+                override fun onFailure(
+                    call: Call<ChatResponse?>,
+                    t: Throwable
+                ) {
+                    t.printStackTrace()
+                }
+
+            })
+
+
+        }
+        catch (e: Exception) {
+            Log.e("ChatRepo", "Exception in initializeChat", e)
+            showFallbackGreeting()
+        }
+
+//                    tutorResponse?.let {
+//                        // Add tutor message to history
+//                        val tutorMessage = Message(
+//                            role = "assistant",
+//                            content = it.tutorMessage,
+//                            correction = it.correction
+//                        )
+//                        // Add assistant response to history
+//                        _conversationHistory.update { history ->
+//                            history + tutorMessage
+//                        }
+//                    }
+
+//                    val tutorResponse = parseTutorResponse(apiResponse)
+//                    tutorResponse?.let {
+//                  //  val tutorResponse = parseTutorResponse(apiResponse)
+//                    _conversationHistory.update {
+//                        listOf(
+//                            Message(
+//                                role = "assistant",
+//                                content = tutorResponse.tutorMessage,
+//                                correction = tutorResponse.correction
+//                            )
+//                        )
+//                    }
+//                        }
+
+            }
+
+//        catch (e: Exception) {
+//            // Fallback greeting
+//            _conversationHistory.update {
+//                listOf(
+//                    Message(
+//                        role = "assistant",
+//                        content = "Hello! I'm your English tutor. How can I help you practice today?",
+//                        correction = null
+//                    )
+//                )
+//            }
+//        }
+
+
+    private fun showFallbackGreeting() {
+        _conversationHistory.update {
+            listOf(
+                Message(
+                    role = "assistant",
+                    content = "Hello! I'm your English tutor. How can I help you practice today?",
+                    correction = null
+                )
+            )
+        }
+    }
     override fun getTopicIntroductionPrompt(topic: String): String {
         return promptBuilder.getTopicIntroductionPrompt(topic)
 
@@ -82,7 +200,10 @@ class OpenAIChatRepository(
                 _conversationHistory.update { history ->
                     history + userMessage
                 }
-                val initialMessage = promptBuilder.buildPrompt(userInput = message,topic = null, history = _conversationHistory.value)
+                val initialMessage = promptBuilder.buildPrompt(
+                    userInput = message,
+                    topic = null,
+                    history = _conversationHistory.value)
 
                 // Create request with full history
                 val messages =initialMessage

@@ -39,6 +39,12 @@ class OpenAIChatViewModel(private val openAIChatRepository: IOpenAIChatRepositor
         }
        // sendInitialPrompt()
     }
+
+    fun startChatSession(topic: String? = null) {
+        viewModelScope.launch {
+            openAIChatRepository.initializeChat(topic)
+        }
+    }
     fun createChatCompelation(message: String)
     {
         openAIChatRepository.createChatCompelation(message)

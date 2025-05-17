@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.chat_fluent.ui.theme.Blue
 import com.example.chat_fluent.ui.theme.LightOrange
 import com.example.chat_fluent.ui.theme.Orange
@@ -44,7 +45,7 @@ import com.example.chat_fluent.models.Courses
 import com.example.chat_fluent.models.Topics
 
 @Composable
-fun TopicsCard(index:Int,topic: Topics,isSelected: Boolean = false,
+fun TopicsCard(index:Int,topic: Topics,isSelected: Boolean = false,navController: NavController,
                onClick: () -> Unit = {}) {
     Card(
 
@@ -72,7 +73,9 @@ fun TopicsCard(index:Int,topic: Topics,isSelected: Boolean = false,
             .size(width = 270.dp, height = 150.dp)
             .clickable (interactionSource = remember { MutableInteractionSource() },
                 indication = null // Disables the ripple effect
-            ){ onClick() }
+            ){ onClick()
+                navController.navigate("temp/${topic.name}")
+            }
     ) {
         Row ( modifier = Modifier
             .padding(16.dp)

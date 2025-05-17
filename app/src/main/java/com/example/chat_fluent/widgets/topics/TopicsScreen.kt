@@ -64,7 +64,10 @@ fun TopicsScreen(navController: NavController, onBack: () -> Unit){
                     index=index,
                     topic = topic,
                     isSelected = index == selectedCourseIndex,
-                    onClick = { selectedCourseIndex = index })
+                    navController = navController,
+                    onClick = {
+                        selectedCourseIndex = index
+                    })
                 //Divider(modifier = Modifier.padding(horizontal = 16.dp))
 
             }

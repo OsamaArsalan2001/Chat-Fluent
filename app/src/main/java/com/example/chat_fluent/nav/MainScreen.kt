@@ -110,6 +110,21 @@ fun MainScreen() {
                 OpenAITestScreen()
             }
 
+//            composable("temp/{topic}") { backStackEntry ->
+//                val topic = backStackEntry.arguments?.getString("topic")
+//                OpenAITestScreen(topic = topic)
+//            }
+//            composable(
+//                "temp/{topic}",
+//                arguments = listOf(navArgument("topic") {
+//                    type = NavType.StringType
+//                    nullable = true
+//                })
+//            ) { backStackEntry ->
+//                val topic = backStackEntry.arguments?.getString("topic")
+//                OpenAITestScreen(topic = topic)
+//            }
+
         }
     }
 

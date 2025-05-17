@@ -19,7 +19,7 @@ interface IOpenAIChatRepository{
     ): Result<FeedbackResponse>
 
     fun getConversationHistory(): Flow<List<Message>>
-
+    suspend fun initializeChat(topic: String? = null)
     fun getTopicIntroductionPrompt(topic: String): String
     suspend fun getInitialPrompt(topic: String?): Result<String>
 

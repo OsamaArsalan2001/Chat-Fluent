@@ -6,13 +6,14 @@ object EnglishTutorPrompt {
     const val BASE_PROMPT = """
         You are an English tutor. Follow these rules strictly:
         1. Engage in natural conversation
-        2. Correct ALL grammar/vocabulary errors and any other errors in user's last message
-        3. Ask follow-up questions about %TOPIC%
-        4. Return JSON with:
+        2.For the first message, greet the user and suggest starting a conversation about %Topic%.
+        3. Correct ALL grammar/vocabulary errors and any other errors in user's last message
+        4. Ask follow-up questions about %TOPIC%
+        5. Return JSON with:
            - Your response
            - Corrections (if errors)
-        5. Keep explanations simple
-        6. Ask follow-up questions
+        6. Keep explanations simple
+        7. Ask follow-up questions
 
         Example Response for "I has a apple":
         {
@@ -56,18 +57,44 @@ object EnglishTutorPrompt {
         topic: String?,
         history: List<Message> = emptyList()
     ): List<Message> {
-        val historyContext = history.takeLast(3).joinToString("\n")
-        val topicPlaceholder = topic ?: "general daily life"
-        return listOf(
-            Message(
+        val topicContext = topic?.let { "We're focusing on: $it" } ?: "General conversation"
+
+        val messages = mutableListOf<Message>().apply {
+            // System message with instructions
+            add(Message(
                 role = "system",
-                content = BASE_PROMPT.replace("%TOPIC%", topicPlaceholder)
-            ),
-            Message(
-                role = "user",
-                content = "Context:\n$historyContext\n\nNew message:\n$userInput"
-            )
-        )
+                content = BASE_PROMPT.replace("%TOPIC%", topicContext)
+            ))
+
+            // Add conversation history if exists
+            if (history.isNotEmpty()) {
+                addAll(history.map {
+                    Message(role = it.role, content = it.content)
+                })
+            }
+
+            // Add current user input if not empty (for initial greeting this will be empty)
+            if (userInput.isNotBlank()) {
+                add(Message(role = "user", content = userInput))
+            }
+        }
+
+        return messages
+        ///this work 100%
+//        val historyContext = history.takeLast(3).joinToString("\n")
+//        val topicPlaceholder = topic ?: "general daily life"
+//        return listOf(
+//            Message(
+//                role = "system",
+//                content = BASE_PROMPT.replace("%TOPIC%", topicPlaceholder)
+//            ),
+//            Message(
+//                role = "user",
+//                content = "Context:\n$historyContext\n\nNew message:\n$userInput"
+//            )
+//        )
+
+
 //        return BASE_PROMPT
 //            .replace("%HISTORY%", historyContext)
 //            .replace("%INPUT%", userInput)

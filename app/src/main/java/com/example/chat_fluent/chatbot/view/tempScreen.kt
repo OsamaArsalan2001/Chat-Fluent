@@ -68,6 +68,11 @@ fun OpenAITestScreen(topic: String? = null) {
             listState.scrollToItem(0)
         }
     }
+    LaunchedEffect(Unit) {
+        if (conversationHistory.isEmpty()) {
+            chatViewModel.startChatSession("Travel")
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -172,27 +177,34 @@ fun MessageBubble2(message: Message) {
     }
 
 @Composable
-fun CorrectionView(correction: Correction) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Red.copy(alpha = 0.1f))
-            .padding(8.dp)
-    ) {
-        Text("✏️ Correction", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Original: ${correction.original}", color = Color.Red)
-        Text("Corrected: ${correction.corrected}", color = Color.Green)
+fun CorrectionView(correction: Correction?) {
+    correction?.let { nonNullCorrection ->
+        nonNullCorrection.errors?.let { errors ->
+            if (errors.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Red.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                ) {
+                    Text("✏️ Correction", fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Original: ${correction.original}", color = Color.Red)
+                    Text("Corrected: ${correction.corrected}", color = Color.Green)
 
-        Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Mistakes found:", fontWeight = FontWeight.Bold)
-        correction.errors.forEach { error ->
-            Column(modifier = Modifier.padding(4.dp)) {
-                Text("Type: ${error.type}")
-                Text("${error.incorrect} → ${error.correct}")
-                Text(error.explanation, fontStyle = FontStyle.Italic)
+                    Text("Mistakes found:", fontWeight = FontWeight.Bold)
+                    correction.errors.forEach { error ->
+                        Column(modifier = Modifier.padding(4.dp)) {
+                            Text("Type: ${error.type}")
+                            Text("${error.incorrect} → ${error.correct}")
+                            Text(error.explanation, fontStyle = FontStyle.Italic)
+                        }
+                    }
+                }
             }
+
         }
     }
-}
+    }
