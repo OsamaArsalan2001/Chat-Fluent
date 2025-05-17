@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
@@ -19,9 +21,14 @@ import com.example.chat_fluent.widgets.topics.TopicsScreen
 import com.example.chat_fluent.widgets.home.HomeScreen
 import com.example.chat_fluent.widgets.courses.CoursesScreen
 import com.example.chat_fluent.ProfileScreen
+import com.example.chat_fluent.chatbot.OpenAIChatRepository
 import com.example.chat_fluent.chatbot.view.OpenAIChatScreen
 import com.example.chat_fluent.chatbot.view.OpenAITestScreen
 import com.example.chat_fluent.chatbot.viewmodel.OpenAIChatViewModel
+import com.example.chat_fluent.chatbot.viewmodel.OpenAIViewModelFactory
+import com.example.chat_fluent.data.network.gemini.OpenAIClient
+import com.example.chat_fluent.data.network.gemini.prompts.EnglishTutorPrompt
+
 //import com.example.chat_fluent.chatscreen
 //import com.example.chat_fluent.chatviewmodel
 
@@ -125,8 +132,25 @@ fun MainScreen() {
                 )
             ) { backStackEntry ->
                 val topic = backStackEntry.arguments?.getString(OpenAIChatScreen.TOPIC_ARG)
+                val chatViewModel: OpenAIChatViewModel = viewModel(
+                    factory = OpenAIViewModelFactory(
+                        OpenAIChatRepository.getInstance(
+                            OpenAIClient.getInstance(),
+                            EnglishTutorPrompt
+                        )
+                    )
+                )
+                // Clear chat when leaving screen
+                DisposableEffect(Unit) {
+                    onDispose {
+                        chatViewModel.clearChat()
+                    }
+                }
+
                 OpenAITestScreen(
-                    onBackClick =  {bottomNavController.navigate(BottomNavItem.Home.route) {
+                    onBackClick =  {
+                        chatViewModel.clearChat()
+                        bottomNavController.navigate(BottomNavItem.Home.route) {
                         popUpTo(BottomNavItem.Home.route) {
                             inclusive = true
                         }
@@ -136,6 +160,7 @@ fun MainScreen() {
                     onFeedbackClick = { bottomNavController.navigate(FeedbackScreen.route) }
                 )
             }
+
 //            composable(
 //                "temp/{topic}",
 //                arguments = listOf(navArgument("topic") {

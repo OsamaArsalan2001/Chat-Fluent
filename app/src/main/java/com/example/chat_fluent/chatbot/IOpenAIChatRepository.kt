@@ -23,6 +23,6 @@ interface IOpenAIChatRepository{
     suspend fun initializeChat(topic: String? = null)
     fun getTopicIntroductionPrompt(topic: String): String
     suspend fun getInitialPrompt(topic: String?): Result<String>
-
+    suspend fun clearConversation()
     fun createChatCompelation(message:String)
 }

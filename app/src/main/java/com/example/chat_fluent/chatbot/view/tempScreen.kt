@@ -83,6 +83,13 @@ fun OpenAITestScreen(topic: String? = null,
             chatViewModel.startChatSession(topic)
         }
     }
+    // Clear and restart chat when topic changes
+    LaunchedEffect(topic) {
+        chatViewModel.clearChat()
+        if (topic != null) {
+            chatViewModel.startChatSession(topic)
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(

@@ -58,12 +58,12 @@ fun HomeScreen(bottomNavController: NavHostController) {
         )
 
 
-        val topics = listOf(
-            Topics("Travel", imageRes = R.drawable.travel),
-            Topics("Business", imageRes = R.drawable.business),
-            Topics("Academic", imageRes = R.drawable.academic),
-            Topics("User Experience", imageRes = R.drawable.travel),
-            Topics("Practice", imageRes = R.drawable.practice)
+    val topics = listOf(
+        Topics("Travel", imageRes = R.drawable.travel),
+        Topics("Business", imageRes = R.drawable.business),
+        Topics("Academic", imageRes = R.drawable.academic),
+        Topics("Hobbies", imageRes = R.drawable.hobbies),
+        Topics("Practice", imageRes = R.drawable.practice)
     )
     Scaffold { padding ->
         Column(
@@ -81,7 +81,10 @@ fun HomeScreen(bottomNavController: NavHostController) {
             ) {
                 Column {
                     Row {
-                        Text("Hi, Nouran "+"\uD83D\uDC4B", style = MaterialTheme.typography.headlineMedium)
+                        Text(
+                            "Hi, Nouran " + "\uD83D\uDC4B",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
 //                        Icon(
 //                            Icons.Default.WavingHand, contentDescription = "Chat", Modifier
 //                                .size(35.dp)
@@ -92,12 +95,17 @@ fun HomeScreen(bottomNavController: NavHostController) {
                     Text("Let's start learning!", style = Typography.titleMedium)
                 }
                 Icon(
-                    painter = painterResource(R.drawable.feedback), contentDescription = "Chat", Modifier
-                        .background(  color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
+                    painter = painterResource(R.drawable.feedback), contentDescription = "Chat",
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp)
+                        )
                         .size(40.dp)
-                        .padding(5.dp), tint = Color.White,
+                        .padding(5.dp),
+                    tint = Color.White,
 
-                )
+                    )
                 // Text("9:41", style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -118,8 +126,10 @@ fun HomeScreen(bottomNavController: NavHostController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("How many hours you studied this week",
-                            style = MaterialTheme.typography.headlineMedium)
+                        Text(
+                            "How many hours you studied this week",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { /* Handle start */
                             bottomNavController.navigate(OpenAIChatScreen.route)
@@ -140,16 +150,23 @@ fun HomeScreen(bottomNavController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Courses Section
-            Row (modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically){
-                Text("Basic Courses", style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.weight(1f,fill = true))
-                TextButton(onClick = {bottomNavController.navigate("courses") {
-                    // Preserve home state in back stack
-                    popUpTo("home") { saveState = true }
-                    launchSingleTop = true
-                } },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Basic Courses", style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.weight(1f, fill = true)
+                )
+                TextButton(
+                    onClick = {
+                        bottomNavController.navigate("courses") {
+                            // Preserve home state in back stack
+                            popUpTo("home") { saveState = true }
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier.wrapContentSize()
                 ) {
                     Text("See all →", style = MaterialTheme.typography.bodyLarge)
@@ -164,12 +181,18 @@ fun HomeScreen(bottomNavController: NavHostController) {
                 itemsIndexed(courses) { index, course ->
                     course.duration?.let {
                         HomeCourseCard(
-                            index=index,
+                            index = index,
                             course = course.name,
                             time = it,
                             imageRes = course.imageRes,
                             isSelected = index == selectedCourseIndex,
-                            onClick = { selectedCourseIndex = index })
+                            onClick = {
+                                selectedCourseIndex = index
+                                bottomNavController.navigate(OpenAIChatScreen.createRoute(course.name)) {
+                                    popUpTo("Home") { saveState = true }
+                                    launchSingleTop = true
+                                }
+                            })
                     }
                 }
 
@@ -177,43 +200,53 @@ fun HomeScreen(bottomNavController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Topics Section
-            Row (modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically){
-                Text("Topics", style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.weight(1f,fill = true))
-                TextButton(onClick = {bottomNavController.navigate("topics") {
-                    // Preserve home state in back stack
-                    popUpTo("home") { saveState = true }
-                    launchSingleTop = true
-                } },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Topics", style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.weight(1f, fill = true)
+                )
+                TextButton(
+                    onClick = {
+                        bottomNavController.navigate("topics") {
+                            // Preserve home state in back stack
+                            popUpTo("home") { saveState = true }
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier.wrapContentSize()
                 ) {
                     Text("See all →", style = MaterialTheme.typography.bodyLarge)
 
                 }
             }
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    itemsIndexed(topics) { index, course ->
-                        HomeTopicsCard(
-                            course = course.name,
-                            imageRes = course.imageRes,
-                            isSelected = index == selectedTopicIndex,
-                            onClick = { selectedTopicIndex = index
-                                selectedTopicIndex = index
-                                Log.d("ChatRepo", "HomeTopicsCard chat with topic: ${course.name}")
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                itemsIndexed(topics) { index, course ->
+                    HomeTopicsCard(
+                        course = course.name,
+                        imageRes = course.imageRes,
+                        isSelected = index == selectedTopicIndex,
+                        onClick = {
+                            selectedTopicIndex = index
+                            selectedTopicIndex = index
+                            Log.d("ChatRepo", "HomeTopicsCard chat with topic: ${course.name}")
 
-                                bottomNavController.navigate(OpenAIChatScreen.createRoute(course.name)) {
-                                    popUpTo("Home") { saveState = true }
-                                    launchSingleTop = true}})
-                    }
-
+                            bottomNavController.navigate(OpenAIChatScreen.createRoute(course.name)) {
+                                popUpTo("Home") { saveState = true }
+                                launchSingleTop = true
+                            }
+                        })
                 }
+
             }
         }
     }
+}
 

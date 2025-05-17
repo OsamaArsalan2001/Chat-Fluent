@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.R
 import com.example.chat_fluent.widgets.courses.CourseCard
 import com.example.chat_fluent.models.Courses
@@ -32,7 +33,7 @@ fun TopicsScreen(navController: NavController, onBack: () -> Unit){
         Topics("Travel",description = "Essential phrases for hotels, directions, and cultural interactions", R.drawable.travel),
         Topics("Business",description = "Professional communication: contracts, negotiations, presentations", R.drawable.business),
         Topics("Academic",description = "Essay writing, research discussions, and scholarly vocabulary", R.drawable.academic),
-        Topics("User Experience",description = "UX terminology, usability testing, and design principles", R.drawable.travel),
+        Topics("Hobbies",description = "In this topic, you will practice talking about your favorite hobbies and free-time activities", R.drawable.hobbies),
         Topics("Practice",description = "Conversation scenarios and real-life dialogue simulations", R.drawable.practice)
     )
     Scaffold(
@@ -64,7 +65,12 @@ fun TopicsScreen(navController: NavController, onBack: () -> Unit){
                     index=index,
                     topic = topic,
                     isSelected = index == selectedCourseIndex,
-                    onClick = { selectedCourseIndex = index })
+                    onClick = { selectedCourseIndex = index
+                        navController.navigate(OpenAIChatScreen.createRoute(topic.name)) {
+                            popUpTo("Home") { saveState = true }
+                            launchSingleTop = true
+                        }
+                    })
                 //Divider(modifier = Modifier.padding(horizontal = 16.dp))
 
             }

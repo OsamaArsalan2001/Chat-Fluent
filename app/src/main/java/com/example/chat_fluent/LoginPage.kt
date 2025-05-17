@@ -333,7 +333,7 @@ fun LoginScreen(navController: NavController , supabase:   SupabaseClient){
                             checked= it
                         } ,
                         colors = CheckboxDefaults.colors(
-                            checkedColor = buttonColorSignup
+                            checkedColor = MaterialTheme.colorScheme.primary
                         )
 
 

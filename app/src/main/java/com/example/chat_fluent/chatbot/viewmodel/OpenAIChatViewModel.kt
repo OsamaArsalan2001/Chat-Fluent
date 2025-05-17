@@ -64,6 +64,11 @@ class OpenAIChatViewModel(private val openAIChatRepository: IOpenAIChatRepositor
             }
         }
     }
+    fun clearChat() {
+        viewModelScope.launch {
+            openAIChatRepository.clearConversation()
+        }
+    }
 //    private fun sendInitialPrompt(topic: String? = null) {
 //        viewModelScope.launch {
 //            _messages.value = ChatApiState.Loading

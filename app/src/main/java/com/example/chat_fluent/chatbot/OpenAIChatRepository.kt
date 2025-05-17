@@ -196,6 +196,10 @@ class OpenAIChatRepository(
         }
     }
 
+    override suspend fun clearConversation() {
+        _conversationHistory.value=emptyList()
+    }
+
     override fun createChatCompelation(message: String) {
         try {
             // Add user message to history

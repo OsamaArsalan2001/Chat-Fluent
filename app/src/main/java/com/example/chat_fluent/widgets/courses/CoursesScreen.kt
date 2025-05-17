@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.R
 import com.example.chat_fluent.models.Courses
 
@@ -61,7 +62,11 @@ fun CoursesScreen(navController: NavController, onBack: () -> Unit){
                 index=index,
                 course = course,
                 isSelected = index == selectedCourseIndex,
-                onClick = { selectedCourseIndex = index })
+                onClick = { selectedCourseIndex = index
+                    navController.navigate(OpenAIChatScreen.createRoute(course.name)) {
+                        popUpTo("Home") { saveState = true }
+                        launchSingleTop = true
+                    }})
             //Divider(modifier = Modifier.padding(horizontal = 16.dp))
 
         }
