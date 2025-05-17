@@ -348,6 +348,7 @@ fun BottomMessagebar(onMessageSend: (String) -> Unit,/* enabled: Boolean*/){
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send ,
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = "Send message")
             }
 

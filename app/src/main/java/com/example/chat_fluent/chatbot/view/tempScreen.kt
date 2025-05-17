@@ -13,12 +13,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.chat_fluent.chatbot.OpenAIChatRepository
@@ -41,7 +47,7 @@ import com.example.chat_fluent.models.Correction
 import com.example.chat_fluent.models.Message
 
 @Composable
-fun OpenAITestScreen() {
+fun OpenAITestScreen(topic: String? = null) {
     val chatViewModel: OpenAIChatViewModel = viewModel(
         factory = OpenAIViewModelFactory(
             OpenAIChatRepository.getInstance(
@@ -53,7 +59,15 @@ fun OpenAITestScreen() {
 
     var message by remember { mutableStateOf("") }
     val conversationHistory by chatViewModel.conversationHistory.collectAsState()
+    // Create and remember the LazyListState
+    val listState = rememberLazyListState()
 
+    // Scroll to bottom when conversation history changes
+    LaunchedEffect(conversationHistory.size) {
+        if (conversationHistory.isNotEmpty()) {
+            listState.scrollToItem(0)
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,6 +79,7 @@ fun OpenAITestScreen() {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
+            state = listState,  // Attach the state
             reverseLayout = true
         ) {
             items(conversationHistory.reversed()) {
@@ -73,14 +88,14 @@ fun OpenAITestScreen() {
         }
 
         // Input field and send button
-        Column(
-            verticalArrangement = Arrangement.Bottom,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ){
         OutlinedTextField(
             value = message,
             onValueChange = { message = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.weight(1f),
             label = { Text("Type your message") },
             singleLine = false,
             maxLines = 3
@@ -88,7 +103,7 @@ fun OpenAITestScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
+        IconButton(
             onClick = {
                 if (message.isNotEmpty()) {
                     Log.d("OpenAITest", "Sending message: $message")
@@ -96,13 +111,17 @@ fun OpenAITestScreen() {
                     message = ""
                 }
             },
-            modifier = Modifier.align(Alignment.End)
+           // modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Send")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send ,
+                contentDescription = "Send message")
+        }
+            //Text("Send")
         }
     }
 }
-}
+
 @Composable
 fun MessageBubble2(message: Message) {
     val isUser = message.role=="user"
