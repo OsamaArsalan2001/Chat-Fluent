@@ -1,4 +1,5 @@
 package com.example.chat_fluent.models
+import com.google.gson.annotations.SerializedName
 
 data class CategoryFeedback(
     val rating: Float,           // 0-5 scale
@@ -25,8 +26,10 @@ data class CategoryFeedback(
 
 data class FeedbackResponse(
     val categories: Map<String, CategoryFeedback>,
+    @SerializedName("cefr_level")
     val cefrLevel: String,
     val strengths: List<String>,
     val weaknesses: List<String>,
+    @SerializedName("study_plan")
     val studyPlan: List<String>
 )

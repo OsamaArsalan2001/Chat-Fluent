@@ -16,13 +16,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,12 +46,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.data.network.gemini.prompts.EnglishTutorPrompt
 import com.example.chat_fluent.models.Correction
 import com.example.chat_fluent.models.Message
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OpenAITestScreen(topic: String? = null) {
+fun OpenAITestScreen(topic: String? = null,
+                     onFeedbackClick: () -> Unit,
+                     onBackClick: () -> Unit,) {
     val chatViewModel: OpenAIChatViewModel = viewModel(
         factory = OpenAIViewModelFactory(
             OpenAIChatRepository.getInstance(
@@ -75,58 +83,85 @@ fun OpenAITestScreen(topic: String? = null) {
             chatViewModel.startChatSession(topic)
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        // Chat messages list
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            state = listState,  // Attach the state
-            reverseLayout = true
-        ) {
-            items(conversationHistory.reversed()) {
-                MessageBubble2(message = it)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {Text("chat screen")},
+                modifier = Modifier,
+                navigationIcon = { IconButton(onClick = onBackClick)
+                {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "back",
+                    )
+                } },
+                actions = {
+                    Button(onClick = {
+                        onFeedbackClick()
+                    }) {
+                        Text("Get Feedback")
+                    }
+
+                })
+        },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                // Chat messages list
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    state = listState,  // Attach the state
+                    reverseLayout = true
+                ) {
+                    items(conversationHistory.reversed()) {
+                        MessageBubble2(message = it)
+                    }
+                }
+
+                // Input field and send button
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = message,
+                        onValueChange = { message = it },
+                        modifier = Modifier.weight(1f),
+                        label = { Text("Type your message") },
+                        singleLine = false,
+                        maxLines = 3
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    IconButton(
+                        onClick = {
+                            if (message.isNotEmpty()) {
+                                Log.d("OpenAITest", "Sending message: $message")
+                                chatViewModel.createChatCompelation(message)
+                                message = ""
+                            }
+                        },
+                        // modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = "Send message"
+                        )
+                    }
+                    //Text("Send")
+                }
             }
         }
+    )
 
-        // Input field and send button
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ){
-        OutlinedTextField(
-            value = message,
-            onValueChange = { message = it },
-            modifier = Modifier.weight(1f),
-            label = { Text("Type your message") },
-            singleLine = false,
-            maxLines = 3
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        IconButton(
-            onClick = {
-                if (message.isNotEmpty()) {
-                    Log.d("OpenAITest", "Sending message: $message")
-                    chatViewModel.createChatCompelation(message)
-                    message = ""
-                }
-            },
-           // modifier = Modifier.align(Alignment.End)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send ,
-                contentDescription = "Send message")
-        }
-            //Text("Send")
-        }
-    }
 }
 
 @Composable

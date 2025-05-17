@@ -125,9 +125,14 @@ fun MainScreen() {
             ) { backStackEntry ->
                 val topic = backStackEntry.arguments?.getString(OpenAIChatScreen.TOPIC_ARG)
                 OpenAITestScreen(
-                    //onBackClick = { /* ... */ },
+                    onBackClick =  {bottomNavController.navigate(BottomNavItem.Home.route) {
+                        popUpTo(BottomNavItem.Home.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }},
                     topic = topic,
-                    //onFeedbackClick = { /* ... */ }
+                    onFeedbackClick = { /* ... */ }
                 )
             }
 //            composable(
