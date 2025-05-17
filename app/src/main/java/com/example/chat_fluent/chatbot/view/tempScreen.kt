@@ -56,6 +56,8 @@ fun OpenAITestScreen(topic: String? = null) {
             )
         )
     )
+    Log.d("ChatRepo", "OpenAITestScreen chat with topic: $topic")
+
 
     var message by remember { mutableStateOf("") }
     val conversationHistory by chatViewModel.conversationHistory.collectAsState()
@@ -70,7 +72,7 @@ fun OpenAITestScreen(topic: String? = null) {
     }
     LaunchedEffect(Unit) {
         if (conversationHistory.isEmpty()) {
-            chatViewModel.startChatSession("Travel")
+            chatViewModel.startChatSession(topic)
         }
     }
     Column(

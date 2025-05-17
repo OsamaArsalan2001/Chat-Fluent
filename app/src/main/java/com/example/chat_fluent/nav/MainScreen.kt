@@ -78,42 +78,58 @@ fun MainScreen() {
 //                val chatViewModel = OpenAIChatViewModel()
 //                OpenAIChatScreen(chatViewModel)
 //            }
-            composable(
-                route = OpenAIChatScreen.route,
-                arguments = listOf(
-                    navArgument("topic") {
-                        type = NavType.StringType
-                        nullable = true
-                    }
-                )
-            ) { backStackEntry ->
-                val topic = backStackEntry.arguments?.getString("topic")
-                OpenAIChatScreen(
-                    onBackClick = {
-                        bottomNavController.navigate(BottomNavItem.Home.route) {
-                            popUpTo(BottomNavItem.Home.route) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    topic = topic,
-                    onFeedbackClick =   {bottomNavController.navigate(BottomNavItem.Home.route) {
-                        popUpTo(BottomNavItem.Home.route) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }}
-                )
-            }
-            composable("temp") {
-                OpenAITestScreen()
-            }
+//            composable(
+//                route = OpenAIChatScreen.route,
+//                arguments = listOf(
+//                    navArgument("topic") {
+//                        type = NavType.StringType
+//                        nullable = true
+//                    }
+//                )
+//            ) { backStackEntry ->
+//                val topic = backStackEntry.arguments?.getString("topic")
+//                OpenAIChatScreen(
+//                    onBackClick = {
+//                        bottomNavController.navigate(BottomNavItem.Home.route) {
+//                            popUpTo(BottomNavItem.Home.route) {
+//                                inclusive = true
+//                            }
+//                            launchSingleTop = true
+//                        }
+//                    },
+//                    topic = topic,
+//                    onFeedbackClick =   {bottomNavController.navigate(BottomNavItem.Home.route) {
+//                        popUpTo(BottomNavItem.Home.route) {
+//                            inclusive = true
+//                        }
+//                        launchSingleTop = true
+//                    }}
+//                )
+//            }
+//            composable("temp") {
+//                OpenAITestScreen()
+//            }
 
 //            composable("temp/{topic}") { backStackEntry ->
 //                val topic = backStackEntry.arguments?.getString("topic")
 //                OpenAITestScreen(topic = topic)
 //            }
+            composable(
+                route = OpenAIChatScreen.route,
+                arguments = listOf(
+                    navArgument(OpenAIChatScreen.TOPIC_ARG) {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) { backStackEntry ->
+                val topic = backStackEntry.arguments?.getString(OpenAIChatScreen.TOPIC_ARG)
+                OpenAITestScreen(
+                    //onBackClick = { /* ... */ },
+                    topic = topic,
+                    //onFeedbackClick = { /* ... */ }
+                )
+            }
 //            composable(
 //                "temp/{topic}",
 //                arguments = listOf(navArgument("topic") {

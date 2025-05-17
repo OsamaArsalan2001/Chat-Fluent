@@ -1,5 +1,6 @@
 package com.example.chat_fluent.widgets.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.chat_fluent.ChatScreenWithTopic
+import com.example.chat_fluent.OpenAIChatScreen
 import com.example.chat_fluent.R
 import com.example.chat_fluent.models.Courses
 import com.example.chat_fluent.models.Topics
@@ -120,7 +122,7 @@ fun HomeScreen(bottomNavController: NavHostController) {
                             style = MaterialTheme.typography.headlineMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { /* Handle start */
-                            bottomNavController.navigate("temp")
+                            bottomNavController.navigate(OpenAIChatScreen.route)
 
                         }) {
                             Text("Let's start")
@@ -203,7 +205,9 @@ fun HomeScreen(bottomNavController: NavHostController) {
                             isSelected = index == selectedTopicIndex,
                             onClick = { selectedTopicIndex = index
                                 selectedTopicIndex = index
-                                bottomNavController.navigate(ChatScreenWithTopic.createRoute(course.name)) {
+                                Log.d("ChatRepo", "HomeTopicsCard chat with topic: ${course.name}")
+
+                                bottomNavController.navigate(OpenAIChatScreen.createRoute(course.name)) {
                                     popUpTo("Home") { saveState = true }
                                     launchSingleTop = true}})
                     }

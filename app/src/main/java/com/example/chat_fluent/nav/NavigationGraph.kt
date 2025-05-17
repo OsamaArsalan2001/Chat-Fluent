@@ -26,9 +26,12 @@ object ChatScreen: Destination {
     override val route: String = "chat"
 }
 object OpenAIChatScreen : Destination {
-    override val route: String = "openai_chat"
+    //override val route: String = "openai_chat"
     const val TOPIC_ARG = "topic"
-    fun createRoute(topic: String? = null) = if (topic != null) "$route/$topic" else route
+    override val route: String = "chat/{$TOPIC_ARG}" // ✅ Match NavHost route
+    fun createRoute(topic: String) = "chat/$topic" // Remove nullable param
+
+   // fun createRoute(topic: String? = null) = if (topic != null) "$route/$topic" else route
 }
 object ChatScreenWithTopic: Destination {
     override val route: String = "ChatM"
