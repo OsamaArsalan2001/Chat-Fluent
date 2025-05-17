@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.android.application")
-  //  id("com.google.gms.google-services")
+    id("com.google.gms.google-services")
     id ("org.jetbrains.kotlin.plugin.serialization")
 }
 
@@ -77,13 +77,13 @@ dependencies {
 //    implementation("com.google.firebase:firebase-firestore")
 //
 //    //Gemini
-//    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
-//    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
-//    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-//    implementation("io.github.jan-tennert.supabase:auth-kt")
-//    implementation("io.github.jan-tennert.supabase:realtime-kt")
-//    implementation("io.ktor:ktor-client-core:3.1.2")
-//    implementation("io.ktor:ktor-client-cio:3.1.2")
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.ktor:ktor-client-core:3.1.2")
+    implementation("io.ktor:ktor-client-cio:3.1.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
 
