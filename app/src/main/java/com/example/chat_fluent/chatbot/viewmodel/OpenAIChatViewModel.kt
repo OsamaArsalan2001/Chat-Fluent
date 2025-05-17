@@ -26,7 +26,8 @@ class OpenAIChatViewModel(private val openAIChatRepository: IOpenAIChatRepositor
 
     private val _conversationHistory = MutableStateFlow<List<Message>>(emptyList())
     val conversationHistory: StateFlow<List<Message>> = _conversationHistory
-  //  val conversationHistory = openAIChatRepository.getConversationHistory()
+
+    //  val conversationHistory = openAIChatRepository.getConversationHistory()
 
     private var currentTopic: String? = null
     private var userLevel: String = "B1" // Default level, can be changed

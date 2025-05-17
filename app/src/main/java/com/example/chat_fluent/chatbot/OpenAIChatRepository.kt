@@ -12,6 +12,7 @@ import com.example.chat_fluent.models.ChatResponse
 import com.example.chat_fluent.models.Choice
 import com.example.chat_fluent.models.FeedbackResponse
 import com.example.chat_fluent.models.TutorResponse
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,8 +30,13 @@ import retrofit2.Response
 
 class OpenAIChatRepository(
     private val remoteSource: OpenAIRemoteSource,
-    private val promptBuilder: EnglishTutorPrompt
+    private val promptBuilder: EnglishTutorPrompt,
+
 ) : IOpenAIChatRepository {
+    val gson = GsonBuilder()
+        .setLenient()
+        .serializeNulls()
+        .create()
 
     private val apiClient= RetrofitHelper.getInstance()
     private val _conversationHistory = MutableStateFlow<List<Message>>(emptyList())
@@ -102,10 +108,20 @@ class OpenAIChatRepository(
             response: Response<ChatResponse?>
         ) {
             if (response.isSuccessful) {
-                response.body()?.choices?.firstOrNull()?.message?.let { assistantMessage ->
+                response.body()?.let { assistantMessage ->
+                   // val parsed = parseResponse(Choice(index = 0,_conversationHistory.value.get(0)))
+                    val tutorResponse = parseTutorResponse(assistantMessage)
+                    tutorResponse?.let {
+                        // Add tutor message to history
+                        val tutorMessage = Message(
+                            role = "assistant",
+                            content = it.tutorMessage,
+                            correction = it.correction
+                        )
                     // Add assistant response to history
                     _conversationHistory.update { history ->
-                        history + assistantMessage
+                        history + tutorMessage
+                    }
                     }
                     Log.d("ChatHistory", "Updated history: ${_conversationHistory.value}")
                 }}
@@ -235,6 +251,15 @@ private fun parseResponse(choice: Choice): TutorResponse {
         )
     }
 }
+    private fun parseTutorResponse(chatResponse: ChatResponse): TutorResponse? {
+        return try {
+            val jsonResponse = chatResponse.choices.first().message.content
+            gson.fromJson(jsonResponse, TutorResponse::class.java)
+        } catch (e: Exception) {
+            Log.e("ParseError", "Failed to parse tutor response", e)
+            null
+        }
+    }
 
     private suspend fun updateHistory(userInput: String, tutorMessage: String?) {
 //        val newHistory = _conversationHistory.value.toMutableList().apply {
